@@ -1,0 +1,100 @@
+/* Built-in exercise library, grouped by primary muscle. */
+const MUSCLE_GROUPS = [
+  "Chest",
+  "Back",
+  "Shoulders",
+  "Quads",
+  "Hamstrings",
+  "Glutes",
+  "Biceps",
+  "Triceps",
+  "Calves",
+  "Core",
+];
+
+const EXERCISES = [
+  // Chest
+  { id: "bench-press", name: "Barbell Bench Press", muscle: "Chest" },
+  { id: "incline-bench", name: "Incline Bench Press", muscle: "Chest" },
+  { id: "db-bench", name: "Dumbbell Bench Press", muscle: "Chest" },
+  { id: "incline-db", name: "Incline Dumbbell Press", muscle: "Chest" },
+  { id: "chest-fly", name: "Dumbbell Chest Fly", muscle: "Chest" },
+  { id: "cable-fly", name: "Cable Fly", muscle: "Chest" },
+  { id: "pec-deck", name: "Pec Deck Machine", muscle: "Chest" },
+  { id: "pushup", name: "Push-Up", muscle: "Chest" },
+  { id: "dip-chest", name: "Chest Dip", muscle: "Chest" },
+
+  // Back
+  { id: "deadlift", name: "Barbell Deadlift", muscle: "Back" },
+  { id: "pullup", name: "Pull-Up", muscle: "Back" },
+  { id: "chinup", name: "Chin-Up", muscle: "Back" },
+  { id: "lat-pulldown", name: "Lat Pulldown", muscle: "Back" },
+  { id: "bb-row", name: "Barbell Row", muscle: "Back" },
+  { id: "db-row", name: "Dumbbell Row", muscle: "Back" },
+  { id: "seated-row", name: "Seated Cable Row", muscle: "Back" },
+  { id: "tbar-row", name: "T-Bar Row", muscle: "Back" },
+  { id: "face-pull", name: "Face Pull", muscle: "Back" },
+  { id: "back-ext", name: "Back Extension", muscle: "Back" },
+  { id: "shrug", name: "Barbell Shrug", muscle: "Back" },
+
+  // Shoulders
+  { id: "ohp", name: "Overhead Press", muscle: "Shoulders" },
+  { id: "db-shoulder", name: "Dumbbell Shoulder Press", muscle: "Shoulders" },
+  { id: "arnold", name: "Arnold Press", muscle: "Shoulders" },
+  { id: "lateral-raise", name: "Lateral Raise", muscle: "Shoulders" },
+  { id: "front-raise", name: "Front Raise", muscle: "Shoulders" },
+  { id: "rear-delt-fly", name: "Rear Delt Fly", muscle: "Shoulders" },
+  { id: "upright-row", name: "Upright Row", muscle: "Shoulders" },
+
+  // Quads
+  { id: "squat", name: "Barbell Back Squat", muscle: "Quads" },
+  { id: "front-squat", name: "Front Squat", muscle: "Quads" },
+  { id: "leg-press", name: "Leg Press", muscle: "Quads" },
+  { id: "leg-ext", name: "Leg Extension", muscle: "Quads" },
+  { id: "lunge", name: "Walking Lunge", muscle: "Quads" },
+  { id: "bulgarian", name: "Bulgarian Split Squat", muscle: "Quads" },
+  { id: "hack-squat", name: "Hack Squat", muscle: "Quads" },
+  { id: "goblet-squat", name: "Goblet Squat", muscle: "Quads" },
+
+  // Hamstrings
+  { id: "rdl", name: "Romanian Deadlift", muscle: "Hamstrings" },
+  { id: "leg-curl", name: "Lying Leg Curl", muscle: "Hamstrings" },
+  { id: "seated-curl", name: "Seated Leg Curl", muscle: "Hamstrings" },
+  { id: "good-morning", name: "Good Morning", muscle: "Hamstrings" },
+  { id: "nordic-curl", name: "Nordic Curl", muscle: "Hamstrings" },
+
+  // Glutes
+  { id: "hip-thrust", name: "Barbell Hip Thrust", muscle: "Glutes" },
+  { id: "glute-bridge", name: "Glute Bridge", muscle: "Glutes" },
+  { id: "cable-kickback", name: "Cable Glute Kickback", muscle: "Glutes" },
+  { id: "sumo-deadlift", name: "Sumo Deadlift", muscle: "Glutes" },
+
+  // Biceps
+  { id: "bb-curl", name: "Barbell Curl", muscle: "Biceps" },
+  { id: "db-curl", name: "Dumbbell Curl", muscle: "Biceps" },
+  { id: "hammer-curl", name: "Hammer Curl", muscle: "Biceps" },
+  { id: "preacher-curl", name: "Preacher Curl", muscle: "Biceps" },
+  { id: "concentration-curl", name: "Concentration Curl", muscle: "Biceps" },
+  { id: "cable-curl", name: "Cable Curl", muscle: "Biceps" },
+
+  // Triceps
+  { id: "tricep-pushdown", name: "Tricep Pushdown", muscle: "Triceps" },
+  { id: "skullcrusher", name: "Skullcrusher", muscle: "Triceps" },
+  { id: "overhead-ext", name: "Overhead Tricep Extension", muscle: "Triceps" },
+  { id: "dip-tricep", name: "Tricep Dip", muscle: "Triceps" },
+  { id: "close-grip-bench", name: "Close-Grip Bench Press", muscle: "Triceps" },
+  { id: "kickback", name: "Tricep Kickback", muscle: "Triceps" },
+
+  // Calves
+  { id: "standing-calf", name: "Standing Calf Raise", muscle: "Calves" },
+  { id: "seated-calf", name: "Seated Calf Raise", muscle: "Calves" },
+  { id: "calf-press", name: "Calf Press on Leg Press", muscle: "Calves" },
+
+  // Core
+  { id: "plank", name: "Plank", muscle: "Core" },
+  { id: "crunch", name: "Crunch", muscle: "Core" },
+  { id: "hanging-raise", name: "Hanging Leg Raise", muscle: "Core" },
+  { id: "russian-twist", name: "Russian Twist", muscle: "Core" },
+  { id: "cable-crunch", name: "Cable Crunch", muscle: "Core" },
+  { id: "ab-wheel", name: "Ab Wheel Rollout", muscle: "Core" },
+];
