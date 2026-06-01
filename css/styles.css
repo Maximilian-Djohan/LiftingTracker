@@ -87,6 +87,16 @@ button { font-family: inherit; cursor: pointer; }
   padding: 10px 12px;
   font-size: 1rem;
 }
+.arrow-btn {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.arrow-btn:disabled { opacity: 0.3; cursor: default; }
 .datebar .today-btn {
   background: var(--bg-elev);
   border: 1px solid var(--border);

@@ -53,14 +53,17 @@
 
   // ---------- Stats ----------
   function workoutStats(w) {
-    let sets = 0, volume = 0;
-    w.exercises.forEach((ex) => {
-      ex.sets.forEach((s) => {
-        sets += 1;
-        volume += (Number(s.reps) || 0) * (Number(s.weight) || 0);
-      });
-    });
-    return { exercises: w.exercises.length, sets, volume };
+    let sets = 0;
+    w.exercises.forEach((ex) => { ex.sets.forEach(() => { sets += 1; }); });
+    return { exercises: w.exercises.length, sets };
+  }
+
+  function shiftDate(days) {
+    const [y, m, d] = state.date.split("-").map(Number);
+    const next = new Date(y, m - 1, d + days);
+    const off = next.getTimezoneOffset();
+    const clamped = new Date(Math.min(next.getTime() - off * 60000, Date.now()));
+    state.date = clamped.toISOString().slice(0, 10);
   }
 
   // ============================================================
@@ -70,15 +73,17 @@
     const w = currentWorkout();
     const stats = workoutStats(w);
 
+    const isToday = state.date === todayStr();
     let html = `
       <div class="datebar">
+        <button class="arrow-btn" id="prevDay">&#8592;</button>
         <input type="date" id="dateInput" value="${state.date}" max="${todayStr()}" />
+        <button class="arrow-btn" id="nextDay" ${isToday ? "disabled" : ""}>&#8594;</button>
         <button class="today-btn" id="todayBtn">Today</button>
       </div>
       <div class="summary">
         <div class="stat"><b>${stats.exercises}</b><span>Exercises</span></div>
         <div class="stat"><b>${stats.sets}</b><span>Sets</span></div>
-        <div class="stat"><b>${Math.round(stats.volume)}</b><span>Vol (${unit()})</span></div>
       </div>
     `;
 
@@ -132,6 +137,14 @@
       state.date = todayStr();
       render();
     });
+    document.getElementById("prevDay").addEventListener("click", () => {
+      shiftDate(-1);
+      render();
+    });
+    document.getElementById("nextDay").addEventListener("click", () => {
+      shiftDate(1);
+      render();
+    });
     document.getElementById("addExBtn").addEventListener("click", openPicker);
 
     view.querySelectorAll("[data-act]").forEach((el) => {
@@ -156,10 +169,9 @@
   function updateSummary() {
     const stats = workoutStats(currentWorkout());
     const stat = view.querySelectorAll(".summary .stat b");
-    if (stat.length === 3) {
+    if (stat.length >= 2) {
       stat[0].textContent = stats.exercises;
       stat[1].textContent = stats.sets;
-      stat[2].textContent = Math.round(stats.volume);
     }
   }
 
