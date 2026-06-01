@@ -20,7 +20,10 @@ device.
 
 This is a zero-dependency static web app (plain HTML/CSS/JavaScript). Your data
 lives in your browser's `localStorage`, so it stays on this device and works
-offline once loaded.
+offline once loaded. Exercise photos are loaded on demand from the open-source
+[free-exercise-db](https://github.com/yuhonas/free-exercise-db) and need an
+internet connection; if an image can't load, a muscle-group icon is shown
+instead.
 
 ## Running it
 

@@ -42,6 +42,20 @@
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 1400);
   }
+  // Exercise thumbnail; falls back to a muscle emoji if no/failed image.
+  const MUSCLE_EMOJI = {
+    Chest: "🫁", Back: "🔙", Shoulders: "🤷", Quads: "🦵", Hamstrings: "🦵",
+    Glutes: "🍑", Biceps: "💪", Triceps: "💪", Calves: "🦶", Core: "🧍",
+  };
+  function thumb(ex) {
+    const fallback = MUSCLE_EMOJI[ex.muscle] || "🏋️";
+    if (ex.img) {
+      return `<span class="thumb"><img src="${esc(ex.img)}" alt="" loading="lazy"
+        onerror="this.parentNode.classList.add('noimg');this.remove();"
+        ><span class="thumb-fallback">${fallback}</span></span>`;
+    }
+    return `<span class="thumb noimg"><span class="thumb-fallback">${fallback}</span></span>`;
+  }
 
   // current working workout (always exists in memory for the selected date)
   function currentWorkout() {
@@ -98,9 +112,12 @@
         html += `
           <div class="card" data-ei="${ei}">
             <div class="ex-head">
-              <div>
-                <div class="ex-name">${esc(ex.name)}</div>
-                <span class="ex-muscle">${esc(ex.muscle || "")}</span>
+              <div class="ex-head-main">
+                ${thumb(ex)}
+                <div>
+                  <div class="ex-name">${esc(ex.name)}</div>
+                  <span class="ex-muscle">${esc(ex.muscle || "")}</span>
+                </div>
               </div>
               <button class="icon-btn danger" data-act="del-ex" data-ei="${ei}">🗑</button>
             </div>
@@ -257,7 +274,7 @@
         byMuscle[m].forEach((e) => {
           html += `
             <div class="ex-item">
-              <div><div class="name">${esc(e.name)}</div></div>
+              <div class="ex-item-main">${thumb(e)}<div class="name">${esc(e.name)}</div></div>
               <button class="add" data-id="${esc(e.id)}">Add</button>
             </div>`;
         });
@@ -324,7 +341,7 @@
         byMuscle[m].forEach((e) => {
           html += `
             <div class="ex-item">
-              <div><div class="name">${esc(e.name)}</div>${e.custom ? '<div class="meta">Custom</div>' : ""}</div>
+              <div class="ex-item-main">${thumb(e)}<div><div class="name">${esc(e.name)}</div>${e.custom ? '<div class="meta">Custom</div>' : ""}</div></div>
               <button class="add" data-id="${esc(e.id)}">+ Add</button>
             </div>`;
         });
