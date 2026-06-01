@@ -3,7 +3,6 @@ const Store = (() => {
   const K_WORKOUTS = "lt_workouts";
   const K_CUSTOM = "lt_customExercises";
   const K_UNIT = "lt_unit";
-  const K_IMAGES = "lt_showImages";
 
   function read(key, fallback) {
     try {
@@ -59,14 +58,6 @@ const Store = (() => {
     write(K_CUSTOM, getCustomExercises().filter((e) => e.id !== id));
   }
 
-  // ---- Settings ----
-  function getShowImages() {
-    return read(K_IMAGES, true);
-  }
-  function setShowImages(v) {
-    write(K_IMAGES, !!v);
-  }
-
   // ---- Unit ----
   function getUnit() {
     return read(K_UNIT, "kg");
@@ -85,7 +76,5 @@ const Store = (() => {
     removeCustomExercise,
     getUnit,
     setUnit,
-    getShowImages,
-    setShowImages,
   };
 })();
