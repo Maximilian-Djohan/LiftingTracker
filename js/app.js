@@ -48,6 +48,7 @@
     Glutes: "🍑", Biceps: "💪", Triceps: "💪", Calves: "🦶", Core: "🧍",
   };
   function thumb(ex) {
+    if (!Store.getShowImages()) return "";
     const fallback = MUSCLE_EMOJI[ex.muscle] || "🏋️";
     if (ex.img) {
       return `<span class="thumb"><img src="${esc(ex.img)}" alt="" loading="lazy"
@@ -342,7 +343,10 @@
           html += `
             <div class="ex-item">
               <div class="ex-item-main">${thumb(e)}<div><div class="name">${esc(e.name)}</div>${e.custom ? '<div class="meta">Custom</div>' : ""}</div></div>
-              <button class="add" data-id="${esc(e.id)}">+ Add</button>
+              <div class="ex-item-actions">
+                <button class="add" data-id="${esc(e.id)}">+ Add</button>
+                ${e.custom ? `<button class="icon-btn danger" data-del="${esc(e.id)}" title="Delete exercise">🗑</button>` : ""}
+              </div>
             </div>`;
         });
         html += `</div>`;
@@ -380,6 +384,16 @@
         const ex = allExercises().find((e) => e.id === b.dataset.id);
         if (ex) {
           addExerciseToWorkout(ex);
+        }
+      })
+    );
+    view.querySelectorAll("[data-del]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const ex = allExercises().find((e) => e.id === b.dataset.del);
+        if (ex && confirm(`Delete "${ex.name}"? This only removes it from your library; past workouts keep it.`)) {
+          Store.removeCustomExercise(b.dataset.del);
+          renderLibrary();
+          toast("Exercise deleted");
         }
       })
     );
@@ -493,6 +507,19 @@
     unitBtn.addEventListener("click", () => {
       Store.setUnit(unit() === "kg" ? "lb" : "kg");
       unitBtn.textContent = unit();
+      render();
+    });
+
+    // image toggle
+    const imgBtn = document.getElementById("imgToggle");
+    const syncImgBtn = () => {
+      imgBtn.textContent = Store.getShowImages() ? "🖼 On" : "🖼 Off";
+      imgBtn.classList.toggle("is-off", !Store.getShowImages());
+    };
+    syncImgBtn();
+    imgBtn.addEventListener("click", () => {
+      Store.setShowImages(!Store.getShowImages());
+      syncImgBtn();
       render();
     });
 

@@ -43,6 +43,8 @@ button { font-family: inherit; cursor: pointer; }
   border-bottom: 1px solid var(--border);
 }
 .app-title { font-size: 1.1rem; margin: 0; font-weight: 700; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.unit-toggle.is-off { opacity: 0.55; }
 .unit-toggle {
   background: var(--bg-elev-2);
   color: var(--text);
@@ -311,6 +313,7 @@ button { font-family: inherit; cursor: pointer; }
 
 .ex-item .name { font-weight: 600; }
 .ex-item .meta { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; }
+.ex-item-actions { display: flex; align-items: center; gap: 4px; flex: 0 0 auto; }
 .ex-item .add {
   background: var(--accent);
   color: #fff;
@@ -360,13 +363,14 @@ button { font-family: inherit; cursor: pointer; }
 .picker-list { overflow-y: auto; flex: 1; }
 
 /* Hide scrollbars (keep scrolling functional) */
-.picker-list, .modal-sheet, body, .view {
+html, body, .picker-list, .modal-sheet, .view {
   scrollbar-width: none;          /* Firefox */
   -ms-overflow-style: none;       /* old Edge/IE */
 }
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
 .picker-list::-webkit-scrollbar,
 .modal-sheet::-webkit-scrollbar,
-body::-webkit-scrollbar,
 .view::-webkit-scrollbar { width: 0; height: 0; display: none; }
 .add-custom {
   border-top: 1px solid var(--border);
