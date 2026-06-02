@@ -37,37 +37,6 @@ function buildBodyFigure(activeMuscle) {
   // Build the front figure SVG using the library's ANTERIOR polygon data
   // and the back figure using POSTERIOR data, side by side.
 
-  function buildView(muscleData, activeGroup, offsetX) {
-    return muscleData.map(group => {
-      const groupName = REVERSE_MAP[group.muscle];
-      const isActive  = groupName === activeGroup;
-      const isRelated = groupName && activeGroup === groupName;
-      const fill      = isActive ? activeColor : (groupName ? subtleColor : bodyColor);
-      const cursor    = groupName ? "pointer" : "default";
-
-      return group.svgPoints.map(points => {
-        // Scale & offset the polygon points: original is 100×200, we scale to 130×260, offset by (offsetX, 0)
-        const scaled = points.trim().split(" ").reduce((acc, val, i) => {
-          const pair = i % 2 === 0;
-          const n = parseFloat(val);
-          if (pair) acc.push((n * 1.3 + offsetX).toFixed(2));
-          else       acc.push((n * 1.3).toFixed(2));
-          return acc;
-        }, []).join(" ");
-
-        const muscleId = group.muscle;
-        return `<polygon points="${scaled}"
-          fill="${fill}"
-          stroke="${isLight ? "rgba(80,100,140,0.3)" : "rgba(150,180,255,0.2)"}"
-          stroke-width="0.6"
-          stroke-linejoin="round"
-          ${groupName ? `data-muscle="${muscleId}"` : ""}
-          style="cursor:${cursor};transition:fill .15s;"
-        />`;
-      }).join("");
-    }).join("");
-  }
-
   // ANTERIOR (front) data — from body-highlighter library
   const ANTERIOR = [
     {muscle:"chest",       svgPoints:["51.8367347 41.6326531 51.0204082 55.1020408 57.9591837 57.9591837 67.755102 55.5102041 70.6122449 47.3469388 62.0408163 41.6326531","29.7959184 46.5306122 31.4285714 55.5102041 40.8163265 57.9591837 48.1632653 55.1020408 47.755102 42.0408163 37.5510204 42.0408163"]},
@@ -136,8 +105,8 @@ function buildBodyFigure(activeMuscle) {
   <svg viewBox="0 0 ${W} ${H + 12}" xmlns="http://www.w3.org/2000/svg"
        class="body-fig" style="width:100%;max-width:320px;display:block;margin:0 auto;">
     <rect x="0" y="0" width="${W}" height="${H + 12}" fill="${bgFill}" rx="12"/>
-    ${polygons(ANTERIOR, 8, 8)}
-    ${polygons(POSTERIOR, 8, 8 + GAP)}
+    ${polygons(ANTERIOR, 8)}
+    ${polygons(POSTERIOR, 8 + GAP)}
     <text x="${Math.round(100*SCALE/2 + 8)}" y="${H + 10}" text-anchor="middle"
           font-size="8" fill="${labelCol2}" font-family="-apple-system,sans-serif"
           font-weight="600" letter-spacing="1">FRONT</text>
