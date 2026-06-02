@@ -1,162 +1,211 @@
 /*
- * Generates an SVG anatomy figure for muscle group selection.
- * Two views side-by-side: front (left) and back (right).
- * Each region is clickable and highlights when active.
+ * Anatomy figure SVG — front + back views, clickable muscle regions.
+ * Paths are hand-crafted bezier curves in a 130×370 local space.
+ * The back figure shares the same paths shifted 150px to the right.
  */
 function buildBodyFigure(activeMuscle) {
-  const cs = getComputedStyle(document.body);
-  const v = (name, fallback) => (cs.getPropertyValue(name).trim() || fallback);
-  const accent   = v("--accent", "#4f8cff");
-  const base      = v("--bg-elev-2", "#2a2f3a");
-  const bodyFill = v("--bg-elev", "#1f232c");
-  const bodyLine = v("--border", "#3a4052");
-  const textCol  = v("--text-dim", "#9aa3b2");
+  const isLight = document.body.classList.contains("theme-light");
 
-  // Returns fill/stroke for a region based on whether it matches the active muscle.
-  function regionStyle(muscle) {
-    const active = activeMuscle === muscle;
-    return `fill="${active ? accent : base}" stroke="${active ? accent : bodyLine}"
-            stroke-width="1" style="cursor:pointer;transition:fill .15s;" opacity="${active ? 1 : 0.85}"`;
+  const bodyFill   = isLight ? "#c8cdd8" : "#252b38";
+  const bodyStroke = isLight ? "#a8b0bf" : "#353d50";
+  const labelCol   = isLight ? "#7a8494" : "#6b7585";
+  const accent     = getComputedStyle(document.body).getPropertyValue("--accent").trim() || "#4f8cff";
+
+  // Each muscle region: slightly visible when inactive, bright accent when active
+  function rFill(m)   { return activeMuscle === m ? accent : (isLight ? "rgba(100,120,160,0.18)" : "rgba(80,110,180,0.18)"); }
+  function rStroke(m) { return activeMuscle === m ? accent : (isLight ? "rgba(100,120,160,0.45)" : "rgba(100,130,200,0.35)"); }
+  function rW(m)      { return activeMuscle === m ? "1.2" : "0.8"; }
+  function reg(m, d)  {
+    return `<path d="${d}" fill="${rFill(m)}" stroke="${rStroke(m)}" stroke-width="${rW(m)}"
+      stroke-linejoin="round" data-muscle="${m}" style="cursor:pointer;transition:fill .15s,stroke .15s;"/>`;
   }
 
-  // Body skin/outline fill
-  const skin = `fill="${bodyFill}" stroke="${bodyLine}" stroke-width="1.2"`;
+  const sk = `fill="${bodyFill}" stroke="${bodyStroke}" stroke-width="1.2" stroke-linejoin="round"`;
 
-  /*
-   * Each figure is drawn in a 130×365 local space.
-   * Front = offset x=0, back = offset x=150.
-   * Human proportions (head ~20px r, total height ~350px).
-   */
+  // ─────────────────────────────────────────────
+  // FRONT FIGURE  (local coords, cx≈65, h≈365)
+  // ─────────────────────────────────────────────
+  const frontSilhouette = `
+    <ellipse ${sk} cx="65" cy="20" rx="13" ry="16"/>
+    <path ${sk} d="
+      M 60,34
+      C 50,38 36,46 18,62
+      C 8,68 2,80 2,110
+      C 0,135 2,162 5,188
+      C 6,200 9,210 11,215
+      C 13,213 15,207 16,200
+      C 14,174 17,148 22,118
+      C 30,88 36,74 37,70
+      C 36,95 34,135 34,172
+      C 32,190 29,207 26,222
+      C 22,240 20,264 22,292
+      C 22,318 20,338 18,356
+      C 17,364 24,370 36,372
+      C 46,374 55,371 58,366
+      C 59,358 58,346 56,338
+      C 54,314 54,290 57,268
+      C 61,244 63,232 65,220
+      C 67,232 69,244 73,268
+      C 76,290 76,314 74,338
+      C 72,346 71,358 72,366
+      C 75,371 84,374 94,372
+      C 106,370 113,364 112,356
+      C 110,338 108,318 108,292
+      C 110,264 108,240 104,222
+      C 101,207 98,190 96,172
+      C 96,135 94,95 93,70
+      C 94,74 100,88 108,118
+      C 113,148 116,174 114,200
+      C 115,207 117,213 119,215
+      C 121,210 124,200 125,188
+      C 128,162 130,135 128,110
+      C 128,80 122,68 112,62
+      C 94,46 80,38 70,34
+      Z
+    "/>`;
 
-  function fig(ox) { // ox = x offset
-    const cx = ox + 65; // center x of figure
-    return `<g transform="translate(${ox},0)">`;
+  // Chest — two pec fan shapes
+  const frontChest = `
+    ${reg("Chest", "M 37,70 C 37,60 48,54 65,54 C 82,54 93,60 93,70 C 92,86 88,102 84,108 C 76,114 66,114 65,114 C 64,114 54,114 46,108 C 42,102 38,86 37,70 Z")}`;
+
+  // Shoulders — rounded caps
+  const frontShoulders = `
+    ${reg("Shoulders", "M 18,62 C 6,66 1,78 1,96 C 1,110 8,120 20,124 C 28,127 36,122 37,112 C 38,100 33,80 37,70 C 30,64 24,60 18,62 Z")}
+    ${reg("Shoulders", "M 112,62 C 124,66 129,78 129,96 C 129,110 122,120 110,124 C 102,127 94,122 93,112 C 92,100 97,80 93,70 C 100,64 106,60 112,62 Z")}`;
+
+  // Biceps — front of upper arms
+  const frontBiceps = `
+    ${reg("Biceps", "M 22,118 C 16,130 14,148 16,164 C 18,172 24,176 30,174 C 36,172 38,164 38,154 C 38,140 36,122 37,112 C 32,112 26,114 22,118 Z")}
+    ${reg("Biceps", "M 108,118 C 114,130 116,148 114,164 C 112,172 106,176 100,174 C 94,172 92,164 92,154 C 92,140 94,122 93,112 C 98,112 104,114 108,118 Z")}`;
+
+  // Forearms
+  const frontForearms = `
+    ${reg("Forearms", "M 16,166 C 10,178 6,196 11,215 C 13,213 15,207 16,200 C 16,186 18,172 22,166 C 20,165 18,165 16,166 Z")}
+    ${reg("Forearms", "M 114,166 C 120,178 124,196 119,215 C 117,213 115,207 114,200 C 114,186 112,172 108,166 C 110,165 112,165 114,166 Z")}`;
+
+  // Abs — segmented core
+  const frontCore = `
+    ${reg("Core", "M 46,110 C 40,120 37,148 38,170 C 44,178 54,182 65,182 C 76,182 86,178 92,170 C 93,148 90,120 84,110 C 76,115 66,115 65,115 C 64,115 54,115 46,110 Z")}`;
+
+  // Quads
+  const frontQuads = `
+    ${reg("Quads", "M 26,222 C 20,240 18,264 20,292 C 22,310 26,324 30,332 C 40,336 52,336 58,330 C 60,310 58,280 57,268 C 61,244 63,232 65,220 C 52,218 36,218 26,222 Z")}
+    ${reg("Quads", "M 104,222 C 110,240 112,264 110,292 C 108,310 104,324 100,332 C 90,336 78,336 72,330 C 70,310 72,280 73,268 C 69,244 67,232 65,220 C 78,218 94,218 104,222 Z")}`;
+
+  // Calves (front — tibialis)
+  const frontCalves = `
+    ${reg("Calves", "M 20,334 C 18,342 17,354 18,356 C 24,370 36,372 58,366 C 59,358 58,346 56,338 C 54,336 44,335 34,335 C 28,335 24,335 20,334 Z")}
+    ${reg("Calves", "M 110,334 C 112,342 113,354 112,356 C 106,370 94,372 72,366 C 71,358 72,346 74,338 C 76,336 86,335 96,335 C 102,335 106,335 110,334 Z")}`;
+
+  // ─────────────────────────────────────────────
+  // BACK FIGURE  (same local coords, shifted +150)
+  // ─────────────────────────────────────────────
+  const backSilhouette = `
+    <ellipse ${sk} cx="65" cy="20" rx="13" ry="16" transform="translate(150,0)"/>
+    <path ${sk} transform="translate(150,0)" d="
+      M 60,34
+      C 50,38 36,46 18,62
+      C 8,68 2,80 2,110
+      C 0,135 2,162 5,188
+      C 6,200 9,210 11,215
+      C 13,213 15,207 16,200
+      C 14,174 17,148 22,118
+      C 30,88 36,74 37,70
+      C 36,95 34,135 34,172
+      C 32,190 29,207 26,222
+      C 22,240 20,264 22,292
+      C 22,318 20,338 18,356
+      C 17,364 24,370 36,372
+      C 46,374 55,371 58,366
+      C 59,358 58,346 56,338
+      C 54,314 54,290 57,268
+      C 61,244 63,232 65,220
+      C 67,232 69,244 73,268
+      C 76,290 76,314 74,338
+      C 72,346 71,358 72,366
+      C 75,371 84,374 94,372
+      C 106,370 113,364 112,356
+      C 110,338 108,318 108,292
+      C 110,264 108,240 104,222
+      C 101,207 98,190 96,172
+      C 96,135 94,95 93,70
+      C 94,74 100,88 108,118
+      C 113,148 116,174 114,200
+      C 115,207 117,213 119,215
+      C 121,210 124,200 125,188
+      C 128,162 130,135 128,110
+      C 128,80 122,68 112,62
+      C 94,46 80,38 70,34
+      Z
+    "/>`;
+
+  function regB(m, d) { // back region helper — applies translate
+    return `<path d="${d}" fill="${rFill(m)}" stroke="${rStroke(m)}" stroke-width="${rW(m)}"
+      stroke-linejoin="round" data-muscle="${m}" transform="translate(150,0)"
+      style="cursor:pointer;transition:fill .15s,stroke .15s;"/>`;
   }
 
-  // ---------- FRONT FIGURE (ox=0, cx=65) ----------
-  const front = `
-  <!-- body silhouette outlines (non-interactive) -->
-  <ellipse ${skin} cx="65" cy="22" rx="16" ry="19"/>
-  <rect    ${skin} x="60" y="39" width="10" height="12" rx="3"/>
+  // Back / Lats — traps upper + lats wide V
+  const backBack = `
+    ${regB("Back", "M 65,34 C 80,38 98,46 112,62 C 116,76 114,96 110,108 C 100,116 84,118 65,118 C 46,118 30,116 20,108 C 16,96 14,76 18,62 C 32,46 50,38 65,34 Z")}
+    ${regB("Back", "M 37,70 C 34,95 34,135 34,172 C 38,184 48,192 65,194 C 82,192 92,184 96,172 C 96,135 96,95 93,70 C 84,78 75,82 65,82 C 55,82 46,78 37,70 Z")}`;
 
-  <!-- arms outline -->
-  <path ${skin} d="M14,68 Q6,90 8,152 Q16,160 28,153 Q36,95 34,68 Z"/>
-  <path ${skin} d="M116,68 Q124,90 122,152 Q114,160 102,153 Q94,95 96,68 Z"/>
-  <!-- forearms (clickable) -->
-  <path ${regionStyle("Forearms")} data-muscle="Forearms" d="M8,152 Q4,188 7,220 Q16,226 27,220 Q32,188 28,153 Z"/>
-  <path ${regionStyle("Forearms")} data-muscle="Forearms" d="M122,152 Q126,188 123,220 Q114,226 103,220 Q98,188 102,153 Z"/>
+  // Rear Shoulders
+  const backShoulders = `
+    ${regB("Shoulders", "M 18,62 C 6,66 1,78 1,96 C 1,110 8,120 20,124 C 28,127 36,122 37,112 C 38,100 33,80 37,70 C 30,64 24,60 18,62 Z")}
+    ${regB("Shoulders", "M 112,62 C 124,66 129,78 129,96 C 129,110 122,120 110,124 C 102,127 94,122 93,112 C 92,100 97,80 93,70 C 100,64 106,60 112,62 Z")}`;
 
-  <!-- torso outline -->
-  <path ${skin} d="M32,54 Q22,60 16,72 L16,148 Q28,155 38,150 L38,236 L92,236 L92,150 Q102,155 114,148 L114,72 Q108,60 98,54 Q83,50 65,50 Q47,50 32,54 Z"/>
+  // Triceps — back of upper arms
+  const backTriceps = `
+    ${regB("Triceps", "M 22,118 C 16,130 14,148 16,164 C 18,172 24,176 30,174 C 36,172 38,164 38,154 C 38,140 36,122 37,112 C 32,112 26,114 22,118 Z")}
+    ${regB("Triceps", "M 108,118 C 114,130 116,148 114,164 C 112,172 106,176 100,174 C 94,172 92,164 92,154 C 92,140 94,122 93,112 C 98,112 104,114 108,118 Z")}`;
 
-  <!-- legs outline -->
-  <path ${skin} d="M38,236 Q33,268 34,310 Q43,318 54,312 Q62,270 65,236 Z"/>
-  <path ${skin} d="M92,236 Q97,268 96,310 Q87,318 76,312 Q68,270 65,236 Z"/>
-  <path ${skin} d="M34,310 Q31,338 34,362 Q42,368 52,363 Q56,338 54,312 Z"/>
-  <path ${skin} d="M96,310 Q99,338 96,362 Q88,368 78,363 Q74,338 76,312 Z"/>
+  // Rear forearms
+  const backForearms = `
+    ${regB("Forearms", "M 16,166 C 10,178 6,196 11,215 C 13,213 15,207 16,200 C 16,186 18,172 22,166 C 20,165 18,165 16,166 Z")}
+    ${regB("Forearms", "M 114,166 C 120,178 124,196 119,215 C 117,213 115,207 114,200 C 114,186 112,172 108,166 C 110,165 112,165 114,166 Z")}`;
 
-  <!-- feet -->
-  <ellipse ${skin} cx="44" cy="367" rx="12" ry="5"/>
-  <ellipse ${skin} cx="86" cy="367" rx="12" ry="5"/>
+  // Glutes
+  const backGlutes = `
+    ${regB("Glutes", "M 26,222 C 20,236 18,254 22,270 C 30,282 48,286 65,286 C 82,286 100,282 108,270 C 112,254 110,236 104,222 C 90,218 78,218 65,220 C 52,218 40,218 26,222 Z")}`;
 
-  <!-- ===== CLICKABLE MUSCLE REGIONS ===== -->
+  // Hamstrings
+  const backHamstrings = `
+    ${regB("Hamstrings", "M 22,272 C 20,290 20,314 22,334 C 28,337 40,338 56,336 C 58,318 57,292 57,268 C 46,270 34,272 22,272 Z")}
+    ${regB("Hamstrings", "M 108,272 C 110,290 110,314 108,334 C 102,337 90,338 74,336 C 72,318 73,292 73,268 C 84,270 96,272 108,272 Z")}`;
 
-  <!-- Chest (two pecs) -->
-  <path ${regionStyle("Chest")} data-muscle="Chest"
-    d="M38,60 Q38,54 52,52 L65,55 L65,108 Q42,110 38,98 Z"/>
-  <path ${regionStyle("Chest")} data-muscle="Chest"
-    d="M92,60 Q92,54 78,52 L65,55 L65,108 Q88,110 92,98 Z"/>
-
-  <!-- Shoulders (front delts) -->
-  <ellipse ${regionStyle("Shoulders")} data-muscle="Shoulders" cx="22" cy="74" rx="14" ry="18"/>
-  <ellipse ${regionStyle("Shoulders")} data-muscle="Shoulders" cx="108" cy="74" rx="14" ry="18"/>
-
-  <!-- Biceps -->
-  <path ${regionStyle("Biceps")} data-muscle="Biceps"
-    d="M10,88 Q6,108 8,148 Q16,156 28,149 Q34,108 30,88 Z"/>
-  <path ${regionStyle("Biceps")} data-muscle="Biceps"
-    d="M120,88 Q124,108 122,148 Q114,156 102,149 Q96,108 100,88 Z"/>
-
-  <!-- Core -->
-  <path ${regionStyle("Core")} data-muscle="Core"
-    d="M40,108 L90,108 Q92,148 90,186 Q78,192 65,192 Q52,192 40,186 Q38,148 40,108 Z"/>
-
-  <!-- Quads -->
-  <path ${regionStyle("Quads")} data-muscle="Quads"
-    d="M40,200 Q35,242 36,304 Q46,312 55,306 Q62,264 65,200 Z"/>
-  <path ${regionStyle("Quads")} data-muscle="Quads"
-    d="M90,200 Q95,242 94,304 Q84,312 75,306 Q68,264 65,200 Z"/>
-
-  <!-- Calves (front shin area) -->
-  <path ${regionStyle("Calves")} data-muscle="Calves"
-    d="M36,308 Q32,336 35,360 Q43,366 52,361 Q56,336 55,308 Z"/>
-  <path ${regionStyle("Calves")} data-muscle="Calves"
-    d="M94,308 Q98,336 95,360 Q87,366 78,361 Q74,336 75,308 Z"/>
-
-  <!-- Labels -->
-  <text x="65" y="14" text-anchor="middle" font-size="8" fill="${textCol}" font-family="sans-serif">FRONT</text>
-  `;
-
-  // ---------- BACK FIGURE (ox=150, cx=215) ----------
-  const back = `
-  <!-- body silhouette outlines -->
-  <ellipse ${skin} cx="215" cy="22" rx="16" ry="19"/>
-  <rect    ${skin} x="210" y="39" width="10" height="12" rx="3"/>
-
-  <path ${skin} d="M164,68 Q156,90 158,152 Q166,160 178,153 Q186,95 184,68 Z"/>
-  <path ${skin} d="M266,68 Q274,90 272,152 Q264,160 252,153 Q244,95 246,68 Z"/>
-  <path ${regionStyle("Forearms")} data-muscle="Forearms" d="M158,152 Q154,188 157,220 Q166,226 177,220 Q182,188 178,153 Z"/>
-  <path ${regionStyle("Forearms")} data-muscle="Forearms" d="M272,152 Q276,188 273,220 Q264,226 253,220 Q248,188 252,153 Z"/>
-
-  <path ${skin} d="M182,54 Q172,60 166,72 L166,148 Q178,155 188,150 L188,236 L242,236 L242,150 Q252,155 264,148 L264,72 Q258,60 248,54 Q233,50 215,50 Q197,50 182,54 Z"/>
-
-  <path ${skin} d="M188,236 Q183,268 184,310 Q193,318 204,312 Q212,270 215,236 Z"/>
-  <path ${skin} d="M242,236 Q247,268 246,310 Q237,318 226,312 Q218,270 215,236 Z"/>
-  <path ${skin} d="M184,310 Q181,338 184,362 Q192,368 202,363 Q206,338 204,312 Z"/>
-  <path ${skin} d="M246,310 Q249,338 246,362 Q238,368 228,363 Q224,338 226,312 Z"/>
-
-  <ellipse ${skin} cx="194" cy="367" rx="12" ry="5"/>
-  <ellipse ${skin} cx="236" cy="367" rx="12" ry="5"/>
-
-  <!-- ===== CLICKABLE MUSCLE REGIONS (back) ===== -->
-
-  <!-- Back / Lats + Traps -->
-  <path ${regionStyle("Back")} data-muscle="Back"
-    d="M184,56 Q172,62 168,78 L168,182 Q182,188 188,184 L192,192 L238,192 L242,184 Q248,188 262,182 L262,78 Q258,62 246,56 Q232,52 215,52 Q198,52 184,56 Z"/>
-
-  <!-- Rear Delts / Shoulders -->
-  <ellipse ${regionStyle("Shoulders")} data-muscle="Shoulders" cx="172" cy="74" rx="14" ry="18"/>
-  <ellipse ${regionStyle("Shoulders")} data-muscle="Shoulders" cx="258" cy="74" rx="14" ry="18"/>
-
-  <!-- Triceps -->
-  <path ${regionStyle("Triceps")} data-muscle="Triceps"
-    d="M160,88 Q156,108 158,148 Q166,156 178,149 Q184,108 180,88 Z"/>
-  <path ${regionStyle("Triceps")} data-muscle="Triceps"
-    d="M270,88 Q274,108 272,148 Q264,156 252,149 Q246,108 250,88 Z"/>
-
-  <!-- Glutes -->
-  <path ${regionStyle("Glutes")} data-muscle="Glutes"
-    d="M188,196 Q183,216 184,248 Q196,256 215,256 Q234,256 246,248 Q247,216 242,196 Z"/>
-
-  <!-- Hamstrings -->
-  <path ${regionStyle("Hamstrings")} data-muscle="Hamstrings"
-    d="M184,250 Q180,278 182,308 Q192,316 203,310 Q210,278 215,250 Z"/>
-  <path ${regionStyle("Hamstrings")} data-muscle="Hamstrings"
-    d="M246,250 Q250,278 248,308 Q238,316 227,310 Q220,278 215,250 Z"/>
-
-  <!-- Calves (back) -->
-  <path ${regionStyle("Calves")} data-muscle="Calves"
-    d="M184,310 Q180,338 183,360 Q191,366 201,361 Q205,336 203,312 Z"/>
-  <path ${regionStyle("Calves")} data-muscle="Calves"
-    d="M246,310 Q250,338 247,360 Q239,366 229,361 Q225,336 227,312 Z"/>
-
-  <text x="215" y="14" text-anchor="middle" font-size="8" fill="${textCol}" font-family="sans-serif">BACK</text>
-  `;
+  // Calves (back — gastrocnemius)
+  const backCalves = `
+    ${regB("Calves", "M 20,336 C 18,344 17,354 18,356 C 24,370 36,372 58,366 C 59,358 58,346 56,338 C 46,337 32,337 20,336 Z")}
+    ${regB("Calves", "M 110,336 C 112,344 113,354 112,356 C 106,370 94,372 72,366 C 71,358 72,346 74,338 C 84,337 98,337 110,336 Z")}`;
 
   return `
-  <svg viewBox="0 0 280 378" xmlns="http://www.w3.org/2000/svg"
-       class="body-fig" style="width:100%;max-width:320px;display:block;margin:0 auto;">
-    <g id="bodyFront">${front}</g>
-    <g id="bodyBack">${back}</g>
+  <svg viewBox="0 0 280 382" xmlns="http://www.w3.org/2000/svg"
+       class="body-fig" style="width:100%;max-width:340px;display:block;margin:0 auto;">
+
+    <!-- FRONT -->
+    ${frontSilhouette}
+    ${frontChest}
+    ${frontShoulders}
+    ${frontBiceps}
+    ${frontForearms}
+    ${frontCore}
+    ${frontQuads}
+    ${frontCalves}
+    <text x="65" y="382" text-anchor="middle" font-size="9" fill="${labelCol}"
+          font-family="-apple-system,sans-serif" font-weight="600">FRONT</text>
+
+    <!-- BACK -->
+    ${backSilhouette}
+    ${backBack}
+    ${backShoulders}
+    ${backTriceps}
+    ${backForearms}
+    ${backGlutes}
+    ${backHamstrings}
+    ${backCalves}
+    <text x="215" y="382" text-anchor="middle" font-size="9" fill="${labelCol}"
+          font-family="-apple-system,sans-serif" font-weight="600">BACK</text>
+
   </svg>`;
 }
