@@ -10,7 +10,7 @@
 <body>
   <header class="app-header">
     <h1 class="app-title">🏋️ Lifting Tracker</h1>
-    <button id="unitToggle" class="unit-toggle" title="Toggle weight unit">kg</button>
+    <button id="settingsBtn" class="settings-btn" title="Settings" aria-label="Settings">⚙️</button>
   </header>
 
   <main id="view" class="view"><!-- views render here --></main>
@@ -38,6 +38,27 @@
       <input id="pickerSearch" class="search" type="search" placeholder="Search exercises…" autocomplete="off" />
       <div id="pickerChips" class="chips"></div>
       <div id="pickerList" class="picker-list"></div>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div id="settingsModal" class="modal hidden">
+    <div class="modal-backdrop" data-close-settings></div>
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <h2>Settings</h2>
+        <button class="icon-btn" data-close-settings>✕</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Weight unit</div>
+          <div class="setting-desc">Used across logging and history</div>
+        </div>
+        <div class="seg" id="unitSeg">
+          <button class="seg-btn" data-unit="kg">kg</button>
+          <button class="seg-btn" data-unit="lb">lb</button>
+        </div>
+      </div>
     </div>
   </div>
 

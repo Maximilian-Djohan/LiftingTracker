@@ -500,14 +500,27 @@
       })
     );
 
-    // unit toggle
-    const unitBtn = document.getElementById("unitToggle");
-    unitBtn.textContent = unit();
-    unitBtn.addEventListener("click", () => {
-      Store.setUnit(unit() === "kg" ? "lb" : "kg");
-      unitBtn.textContent = unit();
-      render();
-    });
+    // settings modal
+    const settingsModal = document.getElementById("settingsModal");
+    const unitSeg = document.getElementById("unitSeg");
+    const syncUnitSeg = () => {
+      unitSeg.querySelectorAll(".seg-btn").forEach((b) =>
+        b.classList.toggle("is-active", b.dataset.unit === unit())
+      );
+    };
+    const openSettings = () => { syncUnitSeg(); settingsModal.classList.remove("hidden"); };
+    const closeSettings = () => settingsModal.classList.add("hidden");
+    document.getElementById("settingsBtn").addEventListener("click", openSettings);
+    settingsModal.querySelectorAll("[data-close-settings]").forEach((el) =>
+      el.addEventListener("click", closeSettings)
+    );
+    unitSeg.querySelectorAll(".seg-btn").forEach((b) =>
+      b.addEventListener("click", () => {
+        Store.setUnit(b.dataset.unit);
+        syncUnitSeg();
+        render();
+      })
+    );
 
     // modal close
     modal.querySelectorAll("[data-close]").forEach((el) =>
