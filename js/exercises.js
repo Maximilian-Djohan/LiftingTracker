@@ -8,6 +8,7 @@ const MUSCLE_GROUPS = [
   "Glutes",
   "Biceps",
   "Triceps",
+  "Forearms",
   "Calves",
   "Core",
 ];
@@ -77,6 +78,12 @@ const EXERCISES = [
   { id: "dip-tricep", name: "Tricep Dip", muscle: "Triceps" },
   { id: "close-grip-bench", name: "Close-Grip Bench Press", muscle: "Triceps" },
   { id: "kickback", name: "Tricep Kickback", muscle: "Triceps" },
+  // Forearms
+  { id: "wrist-curl", name: "Wrist Curl", muscle: "Forearms" },
+  { id: "reverse-wrist-curl", name: "Reverse Wrist Curl", muscle: "Forearms" },
+  { id: "reverse-curl", name: "Reverse Barbell Curl", muscle: "Forearms" },
+  { id: "farmers-walk", name: "Farmer's Walk", muscle: "Forearms" },
+  { id: "wrist-roller", name: "Wrist Roller", muscle: "Forearms" },
   // Calves
   { id: "standing-calf", name: "Standing Calf Raise", muscle: "Calves" },
   { id: "seated-calf", name: "Seated Calf Raise", muscle: "Calves" },

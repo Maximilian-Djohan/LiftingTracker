@@ -40,9 +40,9 @@ function buildBodyFigure(activeMuscle) {
   <!-- arms outline -->
   <path ${skin} d="M14,68 Q6,90 8,152 Q16,160 28,153 Q36,95 34,68 Z"/>
   <path ${skin} d="M116,68 Q124,90 122,152 Q114,160 102,153 Q94,95 96,68 Z"/>
-  <!-- forearms outline -->
-  <path ${skin} d="M8,152 Q4,188 7,220 Q16,226 27,220 Q32,188 28,153 Z"/>
-  <path ${skin} d="M122,152 Q126,188 123,220 Q114,226 103,220 Q98,188 102,153 Z"/>
+  <!-- forearms (clickable) -->
+  <path ${regionStyle("Forearms")} data-muscle="Forearms" d="M8,152 Q4,188 7,220 Q16,226 27,220 Q32,188 28,153 Z"/>
+  <path ${regionStyle("Forearms")} data-muscle="Forearms" d="M122,152 Q126,188 123,220 Q114,226 103,220 Q98,188 102,153 Z"/>
 
   <!-- torso outline -->
   <path ${skin} d="M32,54 Q22,60 16,72 L16,148 Q28,155 38,150 L38,236 L92,236 L92,150 Q102,155 114,148 L114,72 Q108,60 98,54 Q83,50 65,50 Q47,50 32,54 Z"/>
@@ -103,8 +103,8 @@ function buildBodyFigure(activeMuscle) {
 
   <path ${skin} d="M164,68 Q156,90 158,152 Q166,160 178,153 Q186,95 184,68 Z"/>
   <path ${skin} d="M266,68 Q274,90 272,152 Q264,160 252,153 Q244,95 246,68 Z"/>
-  <path ${skin} d="M158,152 Q154,188 157,220 Q166,226 177,220 Q182,188 178,153 Z"/>
-  <path ${skin} d="M272,152 Q276,188 273,220 Q264,226 253,220 Q248,188 252,153 Z"/>
+  <path ${regionStyle("Forearms")} data-muscle="Forearms" d="M158,152 Q154,188 157,220 Q166,226 177,220 Q182,188 178,153 Z"/>
+  <path ${regionStyle("Forearms")} data-muscle="Forearms" d="M272,152 Q276,188 273,220 Q264,226 253,220 Q248,188 252,153 Z"/>
 
   <path ${skin} d="M182,54 Q172,60 166,72 L166,148 Q178,155 188,150 L188,236 L242,236 L242,150 Q252,155 264,148 L264,72 Q258,60 248,54 Q233,50 215,50 Q197,50 182,54 Z"/>
 
