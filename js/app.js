@@ -489,7 +489,12 @@
     );
   }
 
+  function applyTheme() {
+    document.body.classList.toggle("theme-light", Store.getTheme() === "light");
+  }
+
   function init() {
+    applyTheme();
     // tab bar
     document.querySelectorAll(".tab-btn").forEach((b) =>
       b.addEventListener("click", () => {
@@ -508,7 +513,13 @@
         b.classList.toggle("is-active", b.dataset.unit === unit())
       );
     };
-    const openSettings = () => { syncUnitSeg(); settingsModal.classList.remove("hidden"); };
+    const themeSeg = document.getElementById("themeSeg");
+    const syncThemeSeg = () => {
+      themeSeg.querySelectorAll(".seg-btn").forEach((b) =>
+        b.classList.toggle("is-active", b.dataset.theme === Store.getTheme())
+      );
+    };
+    const openSettings = () => { syncUnitSeg(); syncThemeSeg(); settingsModal.classList.remove("hidden"); };
     const closeSettings = () => settingsModal.classList.add("hidden");
     document.getElementById("settingsBtn").addEventListener("click", openSettings);
     settingsModal.querySelectorAll("[data-close-settings]").forEach((el) =>
@@ -519,6 +530,14 @@
         Store.setUnit(b.dataset.unit);
         syncUnitSeg();
         render();
+      })
+    );
+    themeSeg.querySelectorAll(".seg-btn").forEach((b) =>
+      b.addEventListener("click", () => {
+        Store.setTheme(b.dataset.theme);
+        applyTheme();
+        syncThemeSeg();
+        render(); // re-render so the body figure picks up new theme colors
       })
     );
 

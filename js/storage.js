@@ -3,6 +3,7 @@ const Store = (() => {
   const K_WORKOUTS = "lt_workouts";
   const K_CUSTOM = "lt_customExercises";
   const K_UNIT = "lt_unit";
+  const K_THEME = "lt_theme";
 
   function read(key, fallback) {
     try {
@@ -66,6 +67,14 @@ const Store = (() => {
     write(K_UNIT, u);
   }
 
+  // ---- Theme ----
+  function getTheme() {
+    return read(K_THEME, "dark");
+  }
+  function setTheme(t) {
+    write(K_THEME, t);
+  }
+
   return {
     getWorkouts,
     getWorkout,
@@ -76,5 +85,7 @@ const Store = (() => {
     removeCustomExercise,
     getUnit,
     setUnit,
+    getTheme,
+    setTheme,
   };
 })();
