@@ -4,11 +4,13 @@
  * Each region is clickable and highlights when active.
  */
 function buildBodyFigure(activeMuscle) {
-  const accent   = "#4f8cff";
-  const base     = "#2a2f3a";
-  const bodyFill = "#1f232c";
-  const bodyLine = "#3a4052";
-  const textCol  = "#9aa3b2";
+  const cs = getComputedStyle(document.body);
+  const v = (name, fallback) => (cs.getPropertyValue(name).trim() || fallback);
+  const accent   = v("--accent", "#4f8cff");
+  const base      = v("--bg-elev-2", "#2a2f3a");
+  const bodyFill = v("--bg-elev", "#1f232c");
+  const bodyLine = v("--border", "#3a4052");
+  const textCol  = v("--text-dim", "#9aa3b2");
 
   // Returns fill/stroke for a region based on whether it matches the active muscle.
   function regionStyle(muscle) {
