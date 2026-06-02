@@ -252,6 +252,33 @@ button { font-family: inherit; cursor: pointer; }
 .tab-btn.is-active { color: var(--accent); }
 .tab-btn.is-active .tab-icon { filter: none; opacity: 1; }
 
+/* ---------- Body Figure ---------- */
+.body-fig-wrap {
+  margin-bottom: 16px;
+  text-align: center;
+}
+.body-fig {
+  touch-action: manipulation;
+}
+.body-fig-active-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--accent);
+  margin-top: 8px;
+}
+.body-fig-clear {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 /* ---------- Library ---------- */
 .search {
   width: 100%;

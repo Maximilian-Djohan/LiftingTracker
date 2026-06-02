@@ -306,6 +306,14 @@
 
     const groups = ["All", ...MUSCLE_GROUPS];
     let html = `
+      <div class="body-fig-wrap">
+        ${buildBodyFigure(state.pickerMuscle)}
+        ${state.pickerMuscle !== "All" ? `
+          <div class="body-fig-active-label">
+            ${esc(state.pickerMuscle)}
+            <button class="body-fig-clear" id="bodyFigClear">✕ All</button>
+          </div>` : ""}
+      </div>
       <input id="libSearch" class="search" type="search" placeholder="Search exercises…" value="${esc(state.pickerSearch)}" autocomplete="off" />
       <div class="chips" id="libChips">
         ${groups.map((g) => `<button class="chip ${state.pickerMuscle === g ? "is-active" : ""}" data-m="${esc(g)}">${esc(g)}</button>`).join("")}
@@ -360,6 +368,16 @@
     document.getElementById("libChips").querySelectorAll(".chip").forEach((c) =>
       c.addEventListener("click", () => { state.pickerMuscle = c.dataset.m; renderLibrary(); })
     );
+    // Body figure region clicks
+    view.querySelectorAll("[data-muscle]").forEach((el) =>
+      el.addEventListener("click", () => {
+        const m = el.dataset.muscle;
+        state.pickerMuscle = state.pickerMuscle === m ? "All" : m;
+        renderLibrary();
+      })
+    );
+    const clearBtn = document.getElementById("bodyFigClear");
+    if (clearBtn) clearBtn.addEventListener("click", () => { state.pickerMuscle = "All"; renderLibrary(); });
     view.querySelectorAll(".add").forEach((b) =>
       b.addEventListener("click", () => {
         const ex = allExercises().find((e) => e.id === b.dataset.id);
