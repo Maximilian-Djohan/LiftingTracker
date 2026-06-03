@@ -70,8 +70,12 @@ function buildBodyFigure(activeMuscle) {
     {muscle:"calves",         svgPoints:["29.3617021 160.425532 28.5106383 167.234043 24.6808511 179.574468 23.8297872 192.765957 25.5319149 197.021277 28.5106383 193.191489 29.787234 180 31.9148936 171.06383 31.9148936 166.808511","37.4468085 165.106383 35.3191489 167.659574 33.1914894 171.914894 31.0638298 180.425532 30.212766 191.914894 34.0425532 200 38.7234043 190.638298 39.1489362 168.93617","62.9787234 165.106383 61.2765957 168.510638 61.7021277 190.638298 66.3829787 199.574468 70.6382979 191.914894 68.9361702 179.574468 66.8085106 170.212766","70.6382979 160.425532 72.3404255 168.510638 75.7446809 179.148936 76.5957447 192.765957 74.4680851 196.595745 72.3404255 193.617021 70.6382979 179.574468 68.0851064 168.085106"]},
   ];
 
-  const SCALE = 1.28;
-  const GAP   = 140; // x offset for back figure
+  const SCALE   = 1.28;
+  const FIG_W   = Math.round(100 * SCALE);  // 128
+  const BETWEEN = 24;                        // gap between the two figures
+  const PAD     = 12;                        // left/right padding
+  const FRONT_OX = PAD;
+  const BACK_OX  = PAD + FIG_W + BETWEEN;
 
   function scalePoints(pts, ox) {
     return pts.trim().split(/\s+/).reduce((acc, val, i) => {
@@ -97,21 +101,20 @@ function buildBodyFigure(activeMuscle) {
     }).join("");
   }
 
-  const W   = Math.round(100 * SCALE + GAP + 100 * SCALE);
-  const H   = Math.round(200 * SCALE);
-  const labelCol2 = labelCol;
+  const W = PAD * 2 + FIG_W * 2 + BETWEEN;
+  const H = Math.round(200 * SCALE);
 
   return `
-  <svg viewBox="0 0 ${W} ${H + 12}" xmlns="http://www.w3.org/2000/svg"
+  <svg viewBox="0 0 ${W} ${H + 16}" xmlns="http://www.w3.org/2000/svg"
        class="body-fig" style="width:100%;max-width:320px;display:block;margin:0 auto;">
-    <rect x="0" y="0" width="${W}" height="${H + 12}" fill="${bgFill}" rx="12"/>
-    ${polygons(ANTERIOR, 8)}
-    ${polygons(POSTERIOR, 8 + GAP)}
-    <text x="${Math.round(100*SCALE/2 + 8)}" y="${H + 10}" text-anchor="middle"
-          font-size="8" fill="${labelCol2}" font-family="-apple-system,sans-serif"
-          font-weight="600" letter-spacing="1">FRONT</text>
-    <text x="${Math.round(100*SCALE/2 + 8 + GAP)}" y="${H + 10}" text-anchor="middle"
-          font-size="8" fill="${labelCol2}" font-family="-apple-system,sans-serif"
-          font-weight="600" letter-spacing="1">BACK</text>
+    <rect x="0" y="0" width="${W}" height="${H + 16}" fill="${bgFill}" rx="12"/>
+    ${polygons(ANTERIOR, FRONT_OX)}
+    ${polygons(POSTERIOR, BACK_OX)}
+    <text x="${FRONT_OX + FIG_W / 2}" y="${H + 13}" text-anchor="middle"
+          font-size="11" fill="${labelCol}" font-family="-apple-system,sans-serif"
+          font-weight="700" letter-spacing="1.5">FRONT</text>
+    <text x="${BACK_OX + FIG_W / 2}" y="${H + 13}" text-anchor="middle"
+          font-size="11" fill="${labelCol}" font-family="-apple-system,sans-serif"
+          font-weight="700" letter-spacing="1.5">BACK</text>
   </svg>`;
 }
