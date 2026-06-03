@@ -314,6 +314,9 @@ button { font-family: inherit; cursor: pointer; }
 .body-fig {
   touch-action: manipulation;
 }
+.body-fig polygon.is-hover {
+  fill: var(--accent) !important;
+}
 .body-fig-active-label {
   display: inline-flex;
   align-items: center;

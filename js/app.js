@@ -305,7 +305,9 @@
     if (q) list = list.filter((e) => e.name.toLowerCase().includes(q));
 
     const groups = ["All", ...MUSCLE_GROUPS];
+    const showFig = Store.getShowFigure();
     let html = `
+      ${showFig ? `
       <div class="body-fig-wrap">
         ${buildBodyFigure(state.pickerMuscle)}
         ${state.pickerMuscle !== "All" ? `
@@ -313,7 +315,7 @@
             ${esc(state.pickerMuscle)}
             <button class="body-fig-clear" id="bodyFigClear">✕ All</button>
           </div>` : ""}
-      </div>
+      </div>` : ""}
       <input id="libSearch" class="search" type="search" placeholder="Search exercises…" value="${esc(state.pickerSearch)}" autocomplete="off" />
       <div class="chips" id="libChips">
         ${groups.map((g) => `<button class="chip ${state.pickerMuscle === g ? "is-active" : ""}" data-m="${esc(g)}">${esc(g)}</button>`).join("")}
@@ -368,14 +370,23 @@
     document.getElementById("libChips").querySelectorAll(".chip").forEach((c) =>
       c.addEventListener("click", () => { state.pickerMuscle = c.dataset.m; renderLibrary(); })
     );
-    // Body figure region clicks
-    view.querySelectorAll("[data-muscle]").forEach((el) =>
+    // Body figure region clicks + hover highlight
+    const fig = view.querySelector(".body-fig");
+    const setHover = (muscle, on) => {
+      if (!fig) return;
+      fig.querySelectorAll(`[data-muscle="${muscle}"]`).forEach((p) =>
+        p.classList.toggle("is-hover", on)
+      );
+    };
+    view.querySelectorAll("[data-muscle]").forEach((el) => {
+      const m = el.dataset.muscle;
       el.addEventListener("click", () => {
-        const m = el.dataset.muscle;
         state.pickerMuscle = state.pickerMuscle === m ? "All" : m;
         renderLibrary();
-      })
-    );
+      });
+      el.addEventListener("mouseenter", () => setHover(m, true));
+      el.addEventListener("mouseleave", () => setHover(m, false));
+    });
     const clearBtn = document.getElementById("bodyFigClear");
     if (clearBtn) clearBtn.addEventListener("click", () => { state.pickerMuscle = "All"; renderLibrary(); });
     view.querySelectorAll(".add").forEach((b) =>
@@ -519,7 +530,14 @@
         b.classList.toggle("is-active", b.dataset.theme === Store.getTheme())
       );
     };
-    const openSettings = () => { syncUnitSeg(); syncThemeSeg(); settingsModal.classList.remove("hidden"); };
+    const figureSeg = document.getElementById("figureSeg");
+    const syncFigureSeg = () => {
+      const on = Store.getShowFigure();
+      figureSeg.querySelectorAll(".seg-btn").forEach((b) =>
+        b.classList.toggle("is-active", (b.dataset.figure === "on") === on)
+      );
+    };
+    const openSettings = () => { syncUnitSeg(); syncThemeSeg(); syncFigureSeg(); settingsModal.classList.remove("hidden"); };
     const closeSettings = () => settingsModal.classList.add("hidden");
     document.getElementById("settingsBtn").addEventListener("click", openSettings);
     settingsModal.querySelectorAll("[data-close-settings]").forEach((el) =>
@@ -538,6 +556,13 @@
         applyTheme();
         syncThemeSeg();
         render(); // re-render so the body figure picks up new theme colors
+      })
+    );
+    figureSeg.querySelectorAll(".seg-btn").forEach((b) =>
+      b.addEventListener("click", () => {
+        Store.setShowFigure(b.dataset.figure === "on");
+        syncFigureSeg();
+        render();
       })
     );
 

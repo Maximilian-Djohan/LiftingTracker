@@ -106,7 +106,7 @@ function buildBodyFigure(activeMuscle) {
 
   return `
   <svg viewBox="0 0 ${W} ${H + 16}" xmlns="http://www.w3.org/2000/svg"
-       class="body-fig" style="width:100%;max-width:320px;display:block;margin:0 auto;">
+       class="body-fig" style="width:100%;max-width:440px;display:block;margin:0 auto;">
     <rect x="0" y="0" width="${W}" height="${H + 16}" fill="${bgFill}" rx="12"/>
     ${polygons(ANTERIOR, FRONT_OX)}
     ${polygons(POSTERIOR, BACK_OX)}

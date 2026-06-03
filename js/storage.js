@@ -4,6 +4,7 @@ const Store = (() => {
   const K_CUSTOM = "lt_customExercises";
   const K_UNIT = "lt_unit";
   const K_THEME = "lt_theme";
+  const K_FIGURE = "lt_showFigure";
 
   function read(key, fallback) {
     try {
@@ -75,6 +76,14 @@ const Store = (() => {
     write(K_THEME, t);
   }
 
+  // ---- Anatomy figure visibility ----
+  function getShowFigure() {
+    return read(K_FIGURE, true);
+  }
+  function setShowFigure(v) {
+    write(K_FIGURE, !!v);
+  }
+
   return {
     getWorkouts,
     getWorkout,
@@ -87,5 +96,7 @@ const Store = (() => {
     setUnit,
     getTheme,
     setTheme,
+    getShowFigure,
+    setShowFigure,
   };
 })();

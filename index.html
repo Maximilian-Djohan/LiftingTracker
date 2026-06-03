@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#0f1115" />
   <title>Lifting Tracker</title>
-  <link rel="stylesheet" href="css/styles.css?v=14" />
+  <link rel="stylesheet" href="css/styles.css?v=15" />
 </head>
 <body>
   <header class="app-header">
@@ -69,12 +69,22 @@
           <button class="seg-btn" data-theme="light">☀️ Light</button>
         </div>
       </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Anatomy figure</div>
+          <div class="setting-desc">Show the body map in the library</div>
+        </div>
+        <div class="seg" id="figureSeg">
+          <button class="seg-btn" data-figure="on">On</button>
+          <button class="seg-btn" data-figure="off">Off</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script src="js/exercises.js?v=14"></script>
-  <script src="js/bodyfig.js?v=14"></script>
-  <script src="js/storage.js?v=14"></script>
-  <script src="js/app.js?v=14"></script>
+  <script src="js/exercises.js?v=15"></script>
+  <script src="js/bodyfig.js?v=15"></script>
+  <script src="js/storage.js?v=15"></script>
+  <script src="js/app.js?v=15"></script>
 </body>
 </html>
