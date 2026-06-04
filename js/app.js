@@ -89,7 +89,6 @@
     if (w.exercises.length === 0) {
       html += `
         <div class="empty">
-          <span class="big">💪</span>
           No exercises yet for this day.<br/>Tap below to add your first one.
         </div>`;
     } else {
