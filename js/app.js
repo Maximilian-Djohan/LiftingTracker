@@ -371,20 +371,25 @@
     );
     // Body figure region clicks + hover highlight
     const fig = view.querySelector(".body-fig");
-    const setHover = (muscle, on) => {
+    const setHover = (rawId, on) => {
       if (!fig) return;
-      fig.querySelectorAll(`[data-muscle="${muscle}"]`).forEach((p) =>
-        p.classList.toggle("is-hover", on)
+      const group = REVERSE_MAP[rawId];
+      const ids = group ? (MUSCLE_MAP[group] || [rawId]) : [rawId];
+      ids.forEach(id =>
+        fig.querySelectorAll(`[data-muscle="${id}"]`).forEach(p =>
+          p.classList.toggle("is-hover", on)
+        )
       );
     };
     view.querySelectorAll("[data-muscle]").forEach((el) => {
-      const m = el.dataset.muscle;
+      const rawId = el.dataset.muscle;
+      const groupName = REVERSE_MAP[rawId] || rawId;
       el.addEventListener("click", () => {
-        state.pickerMuscle = state.pickerMuscle === m ? "All" : m;
+        state.pickerMuscle = state.pickerMuscle === groupName ? "All" : groupName;
         renderLibrary();
       });
-      el.addEventListener("mouseenter", () => setHover(m, true));
-      el.addEventListener("mouseleave", () => setHover(m, false));
+      el.addEventListener("mouseenter", () => setHover(rawId, true));
+      el.addEventListener("mouseleave", () => setHover(rawId, false));
     });
     const clearBtn = document.getElementById("bodyFigClear");
     if (clearBtn) clearBtn.addEventListener("click", () => { state.pickerMuscle = "All"; renderLibrary(); });
