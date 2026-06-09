@@ -11,6 +11,8 @@ const MUSCLE_GROUPS = [
   "Forearms",
   "Calves",
   "Core",
+  "Neck",
+  "Abductors",
 ];
 
 const EXERCISES = [
@@ -95,4 +97,16 @@ const EXERCISES = [
   { id: "russian-twist", name: "Russian Twist", muscle: "Core" },
   { id: "cable-crunch", name: "Cable Crunch", muscle: "Core" },
   { id: "ab-wheel", name: "Ab Wheel Rollout", muscle: "Core" },
+  // Neck
+  { id: "neck-flexion", name: "Neck Flexion", muscle: "Neck" },
+  { id: "neck-extension", name: "Neck Extension", muscle: "Neck" },
+  { id: "neck-lateral", name: "Lateral Neck Flexion", muscle: "Neck" },
+  { id: "neck-harness", name: "Weighted Neck Harness", muscle: "Neck" },
+  { id: "neck-shrug", name: "Neck Shrug", muscle: "Neck" },
+  // Abductors
+  { id: "hip-abduction", name: "Hip Abduction Machine", muscle: "Abductors" },
+  { id: "cable-abduction", name: "Cable Hip Abduction", muscle: "Abductors" },
+  { id: "band-walk", name: "Banded Lateral Walk", muscle: "Abductors" },
+  { id: "side-lying-raise", name: "Side-Lying Leg Raise", muscle: "Abductors" },
+  { id: "clamshell", name: "Clamshell", muscle: "Abductors" },
 ];

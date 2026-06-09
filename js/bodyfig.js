@@ -17,6 +17,8 @@ const MUSCLE_MAP = {
   Hamstrings: ["hamstring"],
   Glutes:     ["gluteal"],
   Calves:     ["calves"],
+  Neck:       ["neck"],
+  Abductors:  ["abductors", "abductor"],
 };
 
 // Reverse map: library muscle id -> our group name
