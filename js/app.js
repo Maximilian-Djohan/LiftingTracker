@@ -490,12 +490,117 @@
   }
 
   // ============================================================
+  //  CALORIES TAB
+  // ============================================================
+  function renderCalories() {
+    const day = Store.getCalorieDay(state.date) || { date: state.date, items: [] };
+    const goal = Store.getCalorieGoal();
+    const total = day.items.reduce((s, i) => s + (i.kcal || 0), 0);
+    const pct   = Math.min(100, Math.round((total / goal) * 100));
+    const over  = total > goal;
+    const isToday = state.date === todayStr();
+
+    let html = `
+      <div class="datebar">
+        <button class="arrow-btn" id="calPrevDay">&#8592;</button>
+        <input type="date" id="calDateInput" value="${state.date}" max="${todayStr()}" />
+        <button class="arrow-btn" id="calNextDay" ${isToday ? "disabled" : ""}>&#8594;</button>
+        <button class="today-btn" id="calTodayBtn">Today</button>
+      </div>
+
+      <div class="cal-goal-row">
+        <div class="cal-totals">
+          <span class="cal-total ${over ? "over" : ""}">${total}</span>
+          <span class="cal-sep">/</span>
+          <span class="cal-goal-num">${goal} kcal</span>
+        </div>
+        <div class="cal-progress-wrap">
+          <div class="cal-progress-bar" style="width:${pct}%;background:${over ? "var(--danger)" : "var(--accent)"}"></div>
+        </div>
+        <div class="cal-pct">${pct}%</div>
+      </div>
+
+      <div class="cal-remaining ${over ? "over" : ""}">
+        ${over ? `${total - goal} kcal over goal` : `${goal - total} kcal remaining`}
+      </div>
+    `;
+
+    if (day.items.length === 0) {
+      html += `<div class="empty" style="padding:32px 16px;">No entries yet.<br/>Add a meal below.</div>`;
+    } else {
+      day.items.forEach((item, idx) => {
+        html += `
+          <div class="cal-item">
+            <div class="cal-item-info">
+              <div class="cal-item-name">${esc(item.name)}</div>
+              <div class="cal-item-kcal">${item.kcal} kcal</div>
+            </div>
+            <button class="icon-btn danger" data-cal-del="${idx}">🗑</button>
+          </div>`;
+      });
+    }
+
+    html += `
+      <div class="card" style="margin-top:8px;">
+        <div class="section-title">Add Entry</div>
+        <input id="calName" class="search" style="margin-bottom:8px;" type="text" placeholder="Food / meal name" autocomplete="off" />
+        <input id="calKcal" class="search" style="margin-bottom:8px;" type="number" inputmode="numeric" min="0" placeholder="Calories (kcal)" />
+        <button class="btn primary block" id="calAddBtn">Add</button>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Daily Goal</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input id="calGoalInput" class="search" style="margin:0;flex:1;" type="number" inputmode="numeric" min="1" value="${goal}" placeholder="kcal goal" />
+          <button class="btn primary" id="calGoalSave" style="flex:0 0 auto;">Save</button>
+        </div>
+      </div>`;
+
+    view.innerHTML = html;
+
+    document.getElementById("calDateInput").addEventListener("change", (e) => { state.date = e.target.value || todayStr(); render(); });
+    document.getElementById("calTodayBtn").addEventListener("click", () => { state.date = todayStr(); render(); });
+    document.getElementById("calPrevDay").addEventListener("click", () => { shiftDate(-1); render(); });
+    document.getElementById("calNextDay").addEventListener("click", () => { shiftDate(1); render(); });
+
+    document.getElementById("calAddBtn").addEventListener("click", () => {
+      const name = document.getElementById("calName").value.trim();
+      const kcal = parseInt(document.getElementById("calKcal").value, 10);
+      if (!name) { toast("Enter a food name"); return; }
+      if (!kcal || kcal <= 0) { toast("Enter calories"); return; }
+      const d = Store.getCalorieDay(state.date) || { date: state.date, items: [] };
+      d.items.push({ id: Date.now(), name, kcal });
+      Store.saveCalorieDay(d);
+      renderCalories();
+    });
+
+    document.getElementById("calGoalSave").addEventListener("click", () => {
+      const val = parseInt(document.getElementById("calGoalInput").value, 10);
+      if (!val || val <= 0) { toast("Enter a valid goal"); return; }
+      Store.setCalorieGoal(val);
+      toast("Goal saved");
+      renderCalories();
+    });
+
+    view.querySelectorAll("[data-cal-del]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const d = Store.getCalorieDay(state.date);
+        if (!d) return;
+        d.items.splice(Number(b.dataset.calDel), 1);
+        Store.saveCalorieDay(d);
+        renderCalories();
+      })
+    );
+  }
+
+  // ============================================================
   //  SHELL
   // ============================================================
   function render() {
     if (state.tab === "workout") renderWorkout();
     else if (state.tab === "library") renderLibrary();
     else if (state.tab === "history") renderHistory();
+    else if (state.tab === "calories") renderCalories();
   }
 
   function syncTabs() {

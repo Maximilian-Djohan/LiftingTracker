@@ -5,6 +5,8 @@ const Store = (() => {
   const K_UNIT = "lt_unit";
   const K_THEME = "lt_theme";
   const K_FIGURE = "lt_showFigure";
+  const K_CALORIES = "lt_calories";
+  const K_CAL_GOAL = "lt_calGoal";
 
   function read(key, fallback) {
     try {
@@ -84,6 +86,33 @@ const Store = (() => {
     write(K_FIGURE, !!v);
   }
 
+  // ---- Calories ----
+  // entries: { date: "YYYY-MM-DD", items: [{ id, name, kcal }] }
+  function getCalorieLog() {
+    return read(K_CALORIES, []);
+  }
+  function getCalorieDay(date) {
+    return getCalorieLog().find((d) => d.date === date) || null;
+  }
+  function saveCalorieDay(day) {
+    const all = getCalorieLog();
+    const idx = all.findIndex((d) => d.date === day.date);
+    const hasItems = day.items && day.items.length > 0;
+    if (idx >= 0) {
+      if (hasItems) all[idx] = day;
+      else all.splice(idx, 1);
+    } else if (hasItems) {
+      all.push(day);
+    }
+    write(K_CALORIES, all);
+  }
+  function getCalorieGoal() {
+    return read(K_CAL_GOAL, 2000);
+  }
+  function setCalorieGoal(n) {
+    write(K_CAL_GOAL, Number(n));
+  }
+
   return {
     getWorkouts,
     getWorkout,
@@ -98,5 +127,10 @@ const Store = (() => {
     setTheme,
     getShowFigure,
     setShowFigure,
+    getCalorieLog,
+    getCalorieDay,
+    saveCalorieDay,
+    getCalorieGoal,
+    setCalorieGoal,
   };
 })();
