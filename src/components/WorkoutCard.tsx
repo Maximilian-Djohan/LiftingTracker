@@ -5,13 +5,6 @@ interface Props {
   onDelete: (id: string) => void
 }
 
-function totalVolume(workout: Workout): number {
-  return workout.exercises.reduce(
-    (sum, ex) => sum + ex.sets.reduce((s, set) => s + set.weight * set.reps, 0),
-    0
-  )
-}
-
 function formatDate(iso: string): string {
   const d = new Date(iso + 'T00:00:00')
   return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
@@ -19,7 +12,6 @@ function formatDate(iso: string): string {
 
 export function WorkoutCard({ workout, onDelete }: Props) {
   const setCount = workout.exercises.reduce((s, ex) => s + ex.sets.length, 0)
-  const unit = workout.exercises[0]?.sets[0]?.unit ?? 'kg'
 
   return (
     <div className="workout-card">
@@ -34,7 +26,6 @@ export function WorkoutCard({ workout, onDelete }: Props) {
       <div className="workout-stats">
         <span><strong>{workout.exercises.length}</strong> exercises</span>
         <span><strong>{setCount}</strong> sets</span>
-        <span><strong>{totalVolume(workout).toLocaleString()}</strong> {unit} volume</span>
       </div>
 
       <div className="workout-exercises">

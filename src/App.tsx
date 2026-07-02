@@ -12,7 +12,6 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <div className="brand">
-          <span className="logo">🏋️</span>
           <h1>Lifting Tracker</h1>
         </div>
         {!logging && (

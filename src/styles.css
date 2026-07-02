@@ -111,7 +111,7 @@ button {
 /* Stats */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.8rem;
   margin-bottom: 2rem;
 }
@@ -129,7 +129,7 @@ button {
 .stat-value {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--accent);
+  color: #ffffff;
 }
 
 .stat-label {
