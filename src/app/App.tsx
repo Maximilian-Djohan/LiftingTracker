@@ -1,16 +1,20 @@
 import { useState } from 'react'
 import { useWorkouts } from '../hooks/useWorkouts'
+import { useSettings } from '../hooks/useSettings'
 import { LogWorkout } from '../components/LogWorkout'
 import { WorkoutCard } from '../components/WorkoutCard'
 import { Stats } from '../components/Stats'
 import { Nutrition } from '../components/Nutrition'
+import { Exercises } from '../components/Exercises'
+import { SettingsMenu } from '../components/SettingsMenu'
 import { RestTimerWidget } from '../components/RestTimerWidget'
 import './styles.css'
 
-type Page = 'workouts' | 'nutrition'
+type Page = 'workouts' | 'exercises' | 'nutrition'
 
 export default function App() {
   const { workouts, addWorkout, deleteWorkout } = useWorkouts()
+  const { settings, updateSettings } = useSettings()
   const [logging, setLogging] = useState(false)
   const [page, setPage] = useState<Page>('workouts')
 
@@ -20,13 +24,14 @@ export default function App() {
         <div className="brand">
           <h1>Lifting Tracker</h1>
         </div>
+        <SettingsMenu settings={settings} onChange={updateSettings} />
       </header>
 
       <main className="app-main">
-        {page === 'workouts' ? (
+        {page === 'workouts' && (
           logging ? (
             <LogWorkout
-              defaultUnit="kg"
+              defaultUnit={settings.defaultUnit}
               onSave={workout => {
                 addWorkout(workout)
                 setLogging(false)
@@ -59,9 +64,11 @@ export default function App() {
               </section>
             </>
           )
-        ) : (
-          <Nutrition />
         )}
+
+        {page === 'exercises' && <Exercises />}
+
+        {page === 'nutrition' && <Nutrition />}
       </main>
 
       <nav className="bottom-nav">
@@ -71,6 +78,13 @@ export default function App() {
         >
           <span className="nav-icon">🏋️</span>
           Workouts
+        </button>
+        <button
+          className={`nav-item${page === 'exercises' ? ' active' : ''}`}
+          onClick={() => setPage('exercises')}
+        >
+          <span className="nav-icon">📖</span>
+          Exercises
         </button>
         <button
           className={`nav-item${page === 'nutrition' ? ' active' : ''}`}
