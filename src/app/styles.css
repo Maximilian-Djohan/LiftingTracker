@@ -729,9 +729,12 @@ textarea:focus {
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end;
+  justify-content: flex-end;
   padding: 1rem;
+  padding-right: 1.5rem;
+  /* Sit just above the floating button in the bottom-right corner */
+  padding-bottom: calc(var(--nav-height) + 76px + 2.25rem);
   z-index: 100;
   animation: overlay-fade 0.18s ease-out;
 }
