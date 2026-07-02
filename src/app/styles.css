@@ -28,6 +28,7 @@ body {
   max-width: 900px;
   margin: 0 auto;
   padding: 1.5rem;
+  padding-bottom: 6rem;
 }
 
 .app-header {
@@ -145,20 +146,20 @@ button {
 }
 
 .btn-hero {
-  background: var(--accent);
-  color: #1a1207;
-  font-size: 1.25rem;
+  background: rgba(245, 166, 35, 0.12);
+  color: var(--accent);
+  font-size: 1.35rem;
   font-weight: 700;
-  padding: 1.1rem 2.5rem;
+  padding: 2.5rem;
+  min-height: 120px;
+  border: 2px solid rgba(245, 166, 35, 0.35);
   border-radius: var(--radius);
   width: 100%;
-  max-width: 420px;
-  box-shadow: 0 6px 20px rgba(245, 166, 35, 0.25);
 }
 
 .btn-hero:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
+  background: rgba(245, 166, 35, 0.2);
+  border-color: var(--accent);
 }
 
 /* Rest timer */
@@ -466,8 +467,225 @@ textarea:focus {
   margin-top: 1.2rem;
 }
 
+/* Bottom navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem;
+  background: rgba(20, 23, 28, 0.92);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  padding: 0.4rem 1.6rem;
+  border-radius: 10px;
+}
+
+.nav-item:hover {
+  color: var(--text);
+}
+
+.nav-item.active {
+  color: var(--accent);
+  background: var(--surface-2);
+}
+
+.nav-icon {
+  font-size: 1.3rem;
+}
+
+/* Nutrition */
+.section-head,
+.nutrition .log-food h2,
+.nutrition .food-log h2 {
+  margin-bottom: 1rem;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.donut-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.donut {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.donut-ring {
+  position: relative;
+  width: 110px;
+  height: 110px;
+}
+
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.donut-pct {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.donut-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.donut-label {
+  font-weight: 600;
+}
+
+.donut-values {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.goal-editor {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.goal-editor label {
+  flex: 1;
+  min-width: 100px;
+}
+
+.goal-hint {
+  flex-basis: 100%;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.log-food,
+.food-log {
+  margin-top: 2rem;
+}
+
+.food-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.food-form .food-name {
+  flex: 2;
+  min-width: 160px;
+}
+
+.food-form label {
+  flex: 1;
+  min-width: 80px;
+}
+
+.food-calc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+  padding-bottom: 0.4rem;
+}
+
+.food-calc-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.food-calc-label {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+.food-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.food-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+}
+
+.food-row-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.food-row-name {
+  font-weight: 500;
+}
+
+.food-row-macros {
+  display: flex;
+  gap: 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.food-row-cal {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
 @media (max-width: 600px) {
   .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .donut-grid {
     grid-template-columns: repeat(2, 1fr);
   }
   .form-row {
