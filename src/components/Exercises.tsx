@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { DEFAULT_EXERCISES } from '../data/exercises'
+import { REGION_MATCHERS } from '../data/bodyMap'
+import { BodyMap } from './BodyMap'
 
 const CATEGORIES = ['all', 'push', 'pull', 'legs', 'core'] as const
 type Category = (typeof CATEGORIES)[number]
@@ -7,20 +9,38 @@ type Category = (typeof CATEGORIES)[number]
 export function Exercises() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<Category>('all')
+  const [region, setRegion] = useState<string | null>(null)
 
   const filtered = DEFAULT_EXERCISES.filter(ex => {
     const matchesCategory = category === 'all' || ex.category === category
+
     const q = search.trim().toLowerCase()
     const matchesSearch =
       q === '' ||
       ex.name.toLowerCase().includes(q) ||
       ex.muscleGroups.some(m => m.toLowerCase().includes(q))
-    return matchesCategory && matchesSearch
+
+    const terms = region ? REGION_MATCHERS[region] ?? [] : []
+    const matchesRegion =
+      !region || ex.muscleGroups.some(m => terms.some(t => m.toLowerCase().includes(t)))
+
+    return matchesCategory && matchesSearch && matchesRegion
   })
 
   return (
     <div className="exercises-page">
       <h2>Explore Exercises</h2>
+
+      <BodyMap selected={region} onSelect={setRegion} />
+
+      {region && (
+        <div className="region-filter-bar">
+          <span>
+            Showing exercises for <strong>{region}</strong>
+          </span>
+          <button className="btn-ghost small" onClick={() => setRegion(null)}>✕ Clear</button>
+        </div>
+      )}
 
       <input
         className="exercise-search"
@@ -42,7 +62,7 @@ export function Exercises() {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="empty-hint">No exercises match your search.</p>
+        <p className="empty-hint">No exercises match your filters.</p>
       ) : (
         <div className="exercise-grid">
           {filtered.map(ex => (

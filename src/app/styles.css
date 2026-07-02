@@ -729,12 +729,9 @@ textarea:focus {
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
   display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: center;
   padding: 1rem;
-  padding-right: 1.5rem;
-  /* Sit just above the floating button in the bottom-right corner */
-  padding-bottom: calc(var(--nav-height) + 76px + 2.25rem);
   z-index: 100;
   animation: overlay-fade 0.18s ease-out;
 }
@@ -957,6 +954,76 @@ textarea:focus {
   padding: 0.1rem 0.5rem;
   font-size: 0.78rem;
   color: var(--text-dim);
+}
+
+/* Body map */
+.body-map {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.body-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.body-figure svg {
+  width: 150px;
+  height: auto;
+}
+
+.body-figure-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.body-poly {
+  fill: #252b38;
+  stroke: rgba(140, 170, 230, 0.14);
+  stroke-width: 0.6;
+  stroke-linejoin: round;
+}
+
+.body-poly.clickable {
+  fill: #38445c;
+  cursor: pointer;
+  transition: fill 0.15s;
+}
+
+.body-poly.clickable:hover {
+  fill: #4d5d7e;
+}
+
+.body-poly.active {
+  fill: var(--accent);
+}
+
+.region-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: rgba(245, 166, 35, 0.1);
+  border: 1px solid rgba(245, 166, 35, 0.35);
+  border-radius: 10px;
+  padding: 0.5rem 0.9rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.region-filter-bar strong {
+  color: var(--accent);
 }
 
 @media (max-width: 600px) {
