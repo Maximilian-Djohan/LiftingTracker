@@ -4,6 +4,7 @@ import { LogWorkout } from '../components/LogWorkout'
 import { WorkoutCard } from '../components/WorkoutCard'
 import { Stats } from '../components/Stats'
 import { Nutrition } from '../components/Nutrition'
+import { RestTimerWidget } from '../components/RestTimerWidget'
 import './styles.css'
 
 type Page = 'workouts' | 'nutrition'
@@ -79,6 +80,8 @@ export default function App() {
           Nutrition
         </button>
       </nav>
+
+      <RestTimerWidget />
     </div>
   )
 }

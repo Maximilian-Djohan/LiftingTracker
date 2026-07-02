@@ -1,16 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 
-const PRESETS = [60, 90, 120, 180]
-
-function format(seconds: number): string {
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
-  return `${m}:${s.toString().padStart(2, '0')}`
-}
-
 function beep() {
   try {
-    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    const Ctx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
     const ctx = new Ctx()
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()
@@ -26,7 +20,7 @@ function beep() {
   }
 }
 
-export function RestTimer() {
+export function useRestTimer() {
   const [duration, setDuration] = useState(90)
   const [remaining, setRemaining] = useState(90)
   const [running, setRunning] = useState(false)
@@ -70,35 +64,13 @@ export function RestTimer() {
   }
 
   function adjust(delta: number) {
-    setRemaining(prev => Math.max(0, prev + delta))
+    const next = Math.max(0, remaining + delta)
+    setRemaining(next)
+    if (next > duration) setDuration(next)
   }
 
-  const done = remaining === 0
+  // A timer is "active" once started and not reset back to full.
+  const active = running || remaining < duration
 
-  return (
-    <div className={`rest-timer${done ? ' done' : ''}`}>
-      <div className="rest-timer-main">
-        <span className="rest-timer-display">{format(remaining)}</span>
-        <div className="rest-timer-controls">
-          <button className="btn-ghost small" onClick={() => adjust(-15)} disabled={remaining === 0}>−15s</button>
-          <button className="btn-secondary" onClick={toggle}>
-            {done ? 'Restart' : running ? 'Pause' : 'Start'}
-          </button>
-          <button className="btn-ghost small" onClick={() => adjust(15)}>+15s</button>
-          <button className="btn-ghost small" onClick={reset}>Reset</button>
-        </div>
-      </div>
-      <div className="rest-timer-presets">
-        {PRESETS.map(p => (
-          <button
-            key={p}
-            className={`preset-chip${p === duration ? ' active' : ''}`}
-            onClick={() => selectPreset(p)}
-          >
-            {format(p)}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
+  return { duration, remaining, running, active, selectPreset, toggle, reset, adjust }
 }

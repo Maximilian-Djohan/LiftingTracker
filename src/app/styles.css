@@ -681,6 +681,92 @@ textarea:focus {
   white-space: nowrap;
 }
 
+/* Floating rest-timer button */
+.timer-fab {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 5.5rem;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  display: grid;
+  place-items: center;
+  z-index: 60;
+}
+
+.timer-fab:hover {
+  background: var(--border);
+}
+
+.timer-fab-ring {
+  position: absolute;
+  inset: 0;
+  width: 64px;
+  height: 64px;
+  transition: none;
+}
+
+.timer-fab-label {
+  position: relative;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.timer-fab.done {
+  animation: fab-pulse 1s ease-in-out infinite;
+}
+
+@keyframes fab-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 166, 35, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(245, 166, 35, 0);
+  }
+}
+
+/* Rest-timer popup */
+.timer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 100;
+}
+
+.timer-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 420px;
+}
+
+.timer-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.timer-modal-head h3 {
+  font-size: 1.1rem;
+}
+
+.timer-modal .rest-timer {
+  margin-bottom: 0;
+}
+
 @media (max-width: 600px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
