@@ -137,6 +137,99 @@ button {
   color: var(--text-dim);
 }
 
+/* Big centered New Workout button */
+.new-workout-hero {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.btn-hero {
+  background: var(--accent);
+  color: #1a1207;
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding: 1.1rem 2.5rem;
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 6px 20px rgba(245, 166, 35, 0.25);
+}
+
+.btn-hero:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+/* Rest timer */
+.rest-timer {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.rest-timer.done {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+
+.rest-timer-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rest-timer-display {
+  font-size: 2.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.rest-timer.done .rest-timer-display {
+  color: var(--accent);
+}
+
+.rest-timer-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.rest-timer-presets {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.preset-chip {
+  background: var(--surface);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.preset-chip:hover {
+  color: var(--text);
+}
+
+.preset-chip.active {
+  background: var(--accent);
+  color: #1a1207;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
 /* History */
 .history h2,
 .log-workout h2 {

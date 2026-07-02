@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Workout, WorkoutExercise, WorkoutSet } from '../types'
 import { DEFAULT_EXERCISES } from '../data/exercises'
+import { RestTimer } from './RestTimer'
 
 interface Props {
   onSave: (workout: Workout) => void
@@ -80,6 +81,8 @@ export function LogWorkout({ onSave, onCancel, defaultUnit }: Props) {
   return (
     <div className="log-workout">
       <h2>Log Workout</h2>
+
+      <RestTimer />
 
       <div className="form-row">
         <label>

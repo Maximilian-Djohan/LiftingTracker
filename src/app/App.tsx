@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { useWorkouts } from './hooks/useWorkouts'
-import { LogWorkout } from './components/LogWorkout'
-import { WorkoutCard } from './components/WorkoutCard'
-import { Stats } from './components/Stats'
+import { useWorkouts } from '../hooks/useWorkouts'
+import { LogWorkout } from '../components/LogWorkout'
+import { WorkoutCard } from '../components/WorkoutCard'
+import { Stats } from '../components/Stats'
+import './styles.css'
 
 export default function App() {
   const { workouts, addWorkout, deleteWorkout } = useWorkouts()
@@ -14,11 +15,6 @@ export default function App() {
         <div className="brand">
           <h1>Lifting Tracker</h1>
         </div>
-        {!logging && (
-          <button className="btn-primary" onClick={() => setLogging(true)}>
-            + New Workout
-          </button>
-        )}
       </header>
 
       <main className="app-main">
@@ -33,16 +29,19 @@ export default function App() {
           />
         ) : (
           <>
+            <div className="new-workout-hero">
+              <button className="btn-hero" onClick={() => setLogging(true)}>
+                + New Workout
+              </button>
+            </div>
+
             <Stats workouts={workouts} />
 
             <section className="history">
               <h2>History</h2>
               {workouts.length === 0 ? (
                 <div className="empty-state">
-                  <p>No workouts yet.</p>
-                  <button className="btn-primary" onClick={() => setLogging(true)}>
-                    Log your first workout
-                  </button>
+                  <p>No workouts yet — hit “New Workout” to log your first session.</p>
                 </div>
               ) : (
                 <div className="workout-grid">
