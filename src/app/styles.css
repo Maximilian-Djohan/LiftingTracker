@@ -9,6 +9,7 @@
   --accent-hover: #ffb838;
   --danger: #e25555;
   --radius: 12px;
+  --nav-height: 68px;
 }
 
 * {
@@ -28,7 +29,7 @@ body {
   max-width: 900px;
   margin: 0 auto;
   padding: 1.5rem;
-  padding-bottom: 6rem;
+  padding-bottom: calc(var(--nav-height) + 2rem);
 }
 
 .app-header {
@@ -162,53 +163,43 @@ button {
   border-color: var(--accent);
 }
 
-/* Rest timer */
-.rest-timer {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.2rem;
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-
-.rest-timer.done {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent) inset;
-}
-
-.rest-timer-main {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.rest-timer-display {
-  font-size: 2.4rem;
+/* Rest timer (inside popup) */
+.timer-display {
+  font-size: 3.4rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
+  text-align: center;
+  margin: 0.5rem 0 1.2rem;
 }
 
-.rest-timer.done .rest-timer-display {
+.timer-display.done {
   color: var(--accent);
 }
 
-.rest-timer-controls {
+.timer-presets {
   display: flex;
-  align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   flex-wrap: wrap;
+  margin-bottom: 1.2rem;
 }
 
-.rest-timer-presets {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+.timer-primary {
+  width: 100%;
+  padding: 0.9rem;
+  font-size: 1.05rem;
+  margin-bottom: 0.7rem;
+}
+
+.timer-adjust {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+
+.timer-adjust .btn-secondary {
+  text-align: center;
 }
 
 .preset-chip {
@@ -473,10 +464,12 @@ textarea:focus {
   bottom: 0;
   left: 0;
   right: 0;
+  height: var(--nav-height);
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.6rem;
+  padding: 0 0.6rem;
   background: rgba(20, 23, 28, 0.92);
   backdrop-filter: blur(10px);
   border-top: 1px solid var(--border);
@@ -684,10 +677,10 @@ textarea:focus {
 /* Floating rest-timer button */
 .timer-fab {
   position: fixed;
-  right: 1.25rem;
-  bottom: 5.5rem;
-  width: 64px;
-  height: 64px;
+  right: 1.5rem;
+  bottom: calc(var(--nav-height) + 1.5rem);
+  width: 76px;
+  height: 76px;
   border-radius: 50%;
   background: var(--surface-2);
   border: none;
@@ -704,14 +697,13 @@ textarea:focus {
 .timer-fab-ring {
   position: absolute;
   inset: 0;
-  width: 64px;
-  height: 64px;
-  transition: none;
+  width: 100%;
+  height: 100%;
 }
 
 .timer-fab-label {
   position: relative;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--text);
@@ -741,6 +733,16 @@ textarea:focus {
   justify-content: center;
   padding: 1rem;
   z-index: 100;
+  animation: overlay-fade 0.18s ease-out;
+}
+
+@keyframes overlay-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .timer-modal {
@@ -750,6 +752,20 @@ textarea:focus {
   padding: 1.5rem;
   width: 100%;
   max-width: 420px;
+  /* Grow out of the floating button in the bottom-right corner */
+  transform-origin: bottom right;
+  animation: timer-pop 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+@keyframes timer-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.3) translate(30%, 30%);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translate(0, 0);
+  }
 }
 
 .timer-modal-head {
@@ -761,10 +777,6 @@ textarea:focus {
 
 .timer-modal-head h3 {
   font-size: 1.1rem;
-}
-
-.timer-modal .rest-timer {
-  margin-bottom: 0;
 }
 
 @media (max-width: 600px) {

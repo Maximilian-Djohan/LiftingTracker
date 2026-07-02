@@ -52,29 +52,28 @@ export function RestTimerWidget() {
               <button className="btn-ghost small" onClick={() => setOpen(false)}>Minimize ▾</button>
             </div>
 
-            <div className={`rest-timer${done ? ' done' : ''}`}>
-              <div className="rest-timer-main">
-                <span className="rest-timer-display">{format(remaining)}</span>
-                <div className="rest-timer-controls">
-                  <button className="btn-ghost small" onClick={() => adjust(-15)} disabled={remaining === 0}>−15s</button>
-                  <button className="btn-secondary" onClick={toggle}>
-                    {done ? 'Restart' : running ? 'Pause' : 'Start'}
-                  </button>
-                  <button className="btn-ghost small" onClick={() => adjust(15)}>+15s</button>
-                  <button className="btn-ghost small" onClick={reset}>Reset</button>
-                </div>
-              </div>
-              <div className="rest-timer-presets">
-                {PRESETS.map(p => (
-                  <button
-                    key={p}
-                    className={`preset-chip${p === duration ? ' active' : ''}`}
-                    onClick={() => selectPreset(p)}
-                  >
-                    {format(p)}
-                  </button>
-                ))}
-              </div>
+            <div className={`timer-display${done ? ' done' : ''}`}>{format(remaining)}</div>
+
+            <div className="timer-presets">
+              {PRESETS.map(p => (
+                <button
+                  key={p}
+                  className={`preset-chip${p === duration ? ' active' : ''}`}
+                  onClick={() => selectPreset(p)}
+                >
+                  {format(p)}
+                </button>
+              ))}
+            </div>
+
+            <button className="btn-primary timer-primary" onClick={toggle}>
+              {done ? 'Restart' : running ? 'Pause' : 'Start'}
+            </button>
+
+            <div className="timer-adjust">
+              <button className="btn-secondary" onClick={() => adjust(-15)} disabled={remaining === 0}>−15s</button>
+              <button className="btn-secondary" onClick={reset}>Reset</button>
+              <button className="btn-secondary" onClick={() => adjust(15)}>+15s</button>
             </div>
           </div>
         </div>
