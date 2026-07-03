@@ -25,6 +25,27 @@ export function SettingsMenu({ settings, onChange }: Props) {
 
             <div className="settings-row">
               <div className="settings-row-text">
+                <span className="settings-row-label">Minimalist mode</span>
+                <span className="settings-row-hint">Hide extra detail like muscle groups</span>
+              </div>
+              <div className="unit-toggle">
+                <button
+                  className={`unit-option${settings.minimalist ? ' active' : ''}`}
+                  onClick={() => onChange({ minimalist: true })}
+                >
+                  On
+                </button>
+                <button
+                  className={`unit-option${!settings.minimalist ? ' active' : ''}`}
+                  onClick={() => onChange({ minimalist: false })}
+                >
+                  Off
+                </button>
+              </div>
+            </div>
+
+            <div className="settings-row">
+              <div className="settings-row-text">
                 <span className="settings-row-label">Default unit</span>
                 <span className="settings-row-hint">Used when starting a new workout</span>
               </div>

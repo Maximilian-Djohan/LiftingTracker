@@ -8,9 +8,10 @@ type Category = (typeof CATEGORIES)[number]
 
 interface Props {
   showBodyMap: boolean
+  minimalist: boolean
 }
 
-export function Exercises({ showBodyMap }: Props) {
+export function Exercises({ showBodyMap, minimalist }: Props) {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<Category>('all')
   const [region, setRegion] = useState<string | null>(null)
@@ -75,11 +76,13 @@ export function Exercises({ showBodyMap }: Props) {
                 <h3>{ex.name}</h3>
                 <span className={`category-badge ${ex.category}`}>{ex.category}</span>
               </div>
-              <div className="muscle-tags">
-                {ex.muscleGroups.map(m => (
-                  <span key={m} className="muscle-tag">{m}</span>
-                ))}
-              </div>
+              {!minimalist && (
+                <div className="muscle-tags">
+                  {ex.muscleGroups.map(m => (
+                    <span key={m} className="muscle-tag">{m}</span>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>

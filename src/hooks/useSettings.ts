@@ -6,9 +6,15 @@ export interface Settings {
   defaultUnit: 'kg' | 'lbs'
   theme: 'dark' | 'light'
   showBodyMap: boolean
+  minimalist: boolean
 }
 
-const DEFAULT_SETTINGS: Settings = { defaultUnit: 'kg', theme: 'dark', showBodyMap: true }
+const DEFAULT_SETTINGS: Settings = {
+  defaultUnit: 'kg',
+  theme: 'dark',
+  showBodyMap: true,
+  minimalist: true,
+}
 
 export function useSettings() {
   const [settings, setSettings] = useState<Settings>(() => {

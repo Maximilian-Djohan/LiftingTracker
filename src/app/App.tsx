@@ -123,6 +123,7 @@ export default function App() {
       defaultUnit={settings.defaultUnit}
       activeSplit={activeSplit}
       workouts={workouts}
+      minimalist={settings.minimalist}
       onSave={workout => {
         addWorkout(workout)
         setLogging(false)
@@ -131,13 +132,13 @@ export default function App() {
     />
   ) : (
     <>
+      <Stats workouts={workouts} />
+
       <div className="new-workout-hero">
         <button className="btn-hero" onClick={() => setLogging(true)}>
           + New Workout
         </button>
       </div>
-
-      <Stats workouts={workouts} />
 
       <section className="history">
         <h2>History</h2>
@@ -185,7 +186,7 @@ export default function App() {
             />
           </div>
           <div className="pager-page">
-            <Exercises showBodyMap={settings.showBodyMap} />
+            <Exercises showBodyMap={settings.showBodyMap} minimalist={settings.minimalist} />
           </div>
           <div className="pager-page">
             <Nutrition />

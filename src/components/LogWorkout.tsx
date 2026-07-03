@@ -8,6 +8,7 @@ interface Props {
   defaultUnit: 'kg' | 'lbs'
   activeSplit: Split | null
   workouts: Workout[]
+  minimalist: boolean
 }
 
 function newSet(unit: 'kg' | 'lbs'): WorkoutSet {
@@ -23,7 +24,7 @@ function newWorkoutExercise(exerciseId: string, exerciseName: string, unit: 'kg'
   }
 }
 
-export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workouts }: Props) {
+export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workouts, minimalist }: Props) {
   const today = new Date().toISOString().split('T')[0]
   const [name, setName] = useState('')
   const [date, setDate] = useState(today)
@@ -231,7 +232,9 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
                       {ex.name}
                       {added && <span className="picker-added">✓</span>}
                     </span>
-                    <span className="picker-item-muscles">{ex.muscleGroups.slice(0, 3).join(' · ')}</span>
+                    {!minimalist && (
+                      <span className="picker-item-muscles">{ex.muscleGroups.slice(0, 3).join(' · ')}</span>
+                    )}
                   </button>
                 )
               })}
