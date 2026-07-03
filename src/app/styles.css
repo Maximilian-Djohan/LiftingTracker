@@ -26,6 +26,19 @@ body {
   overflow-x: hidden;
 }
 
+/* Hide scrollbars app-wide (scrolling still works) */
+html {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* legacy Edge/IE */
+}
+
+html::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none; /* Chromium / WebKit */
+}
+
 /* Light theme */
 body.theme-light {
   --bg: #f2f4f8;
@@ -81,33 +94,38 @@ body.theme-light .settings-overlay {
   overflow-x: hidden;
 }
 
+.page-view.slide-forward,
+.page-view.slide-back {
+  will-change: transform, opacity;
+}
+
 .page-view.slide-forward {
-  animation: page-in-forward 0.28s cubic-bezier(0.25, 0.8, 0.35, 1);
+  animation: page-in-forward 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .page-view.slide-back {
-  animation: page-in-back 0.28s cubic-bezier(0.25, 0.8, 0.35, 1);
+  animation: page-in-back 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes page-in-forward {
   from {
-    opacity: 0;
-    transform: translateX(56px);
+    opacity: 0.5;
+    transform: translateX(26px);
   }
   to {
     opacity: 1;
-    transform: none;
+    transform: translateX(0);
   }
 }
 
 @keyframes page-in-back {
   from {
-    opacity: 0;
-    transform: translateX(-56px);
+    opacity: 0.5;
+    transform: translateX(-26px);
   }
   to {
     opacity: 1;
-    transform: none;
+    transform: translateX(0);
   }
 }
 
