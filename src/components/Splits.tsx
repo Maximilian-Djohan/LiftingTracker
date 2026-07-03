@@ -5,8 +5,11 @@ import { DEFAULT_EXERCISES } from '../data/exercises'
 interface Props {
   splits: Split[]
   activeSplitId: string | null
+  editedFeaturedIds: string[]
   onSetActive: (id: string | null) => void
   onCreate: (split: Split) => void
+  onUpdate: (split: Split) => void
+  onReset: (id: string) => void
   onDelete: (id: string) => void
 }
 
@@ -20,12 +23,48 @@ interface DraftDay {
   exerciseIds: string[]
 }
 
-export function Splits({ splits, activeSplitId, onSetActive, onCreate, onDelete }: Props) {
-  const [building, setBuilding] = useState(false)
+type Editor =
+  | { mode: 'closed' }
+  | { mode: 'create' }
+  | { mode: 'edit'; id: string }
+
+export function Splits({
+  splits,
+  activeSplitId,
+  editedFeaturedIds,
+  onSetActive,
+  onCreate,
+  onUpdate,
+  onReset,
+  onDelete,
+}: Props) {
+  const [editor, setEditor] = useState<Editor>({ mode: 'closed' })
   const [draftName, setDraftName] = useState('')
   const [draftDays, setDraftDays] = useState<DraftDay[]>([])
 
   const activeSplit = splits.find(s => s.id === activeSplitId) ?? null
+  const editedSet = new Set(editedFeaturedIds)
+  function isFeatured(split: Split) {
+    return !split.custom
+  }
+
+  function openCreate() {
+    setDraftName('')
+    setDraftDays([{ id: crypto.randomUUID(), name: 'Day 1', exerciseIds: [] }])
+    setEditor({ mode: 'create' })
+  }
+
+  function openEdit(split: Split) {
+    setDraftName(split.name)
+    setDraftDays(split.days.map(d => ({ id: d.id, name: d.name, exerciseIds: [...d.exerciseIds] })))
+    setEditor({ mode: 'edit', id: split.id })
+  }
+
+  function closeEditor() {
+    setEditor({ mode: 'closed' })
+    setDraftName('')
+    setDraftDays([])
+  }
 
   function addDraftDay() {
     setDraftDays(prev => [
@@ -61,20 +100,31 @@ export function Splits({ splits, activeSplitId, onSetActive, onCreate, onDelete 
   }
 
   function saveDraft() {
-    const split: Split = {
-      id: crypto.randomUUID(),
-      name: draftName.trim() || 'My Split',
-      description: 'Custom split',
-      days: draftDays
-        .filter(d => d.exerciseIds.length > 0)
-        .map<SplitDay>(d => ({ id: d.id, name: d.name.trim() || 'Day', exerciseIds: d.exerciseIds })),
-      custom: true,
+    const days = draftDays
+      .filter(d => d.exerciseIds.length > 0)
+      .map<SplitDay>(d => ({ id: d.id, name: d.name.trim() || 'Day', exerciseIds: d.exerciseIds }))
+
+    if (editor.mode === 'edit') {
+      const existing = splits.find(s => s.id === editor.id)
+      onUpdate({
+        id: editor.id,
+        name: draftName.trim() || 'My Split',
+        description: existing?.description ?? 'Custom split',
+        days,
+        custom: existing?.custom,
+      })
+    } else {
+      const split: Split = {
+        id: crypto.randomUUID(),
+        name: draftName.trim() || 'My Split',
+        description: 'Custom split',
+        days,
+        custom: true,
+      }
+      onCreate(split)
+      onSetActive(split.id)
     }
-    onCreate(split)
-    onSetActive(split.id)
-    setBuilding(false)
-    setDraftName('')
-    setDraftDays([])
+    closeEditor()
   }
 
   const canSaveDraft = draftDays.some(d => d.exerciseIds.length > 0)
@@ -112,13 +162,16 @@ export function Splits({ splits, activeSplitId, onSetActive, onCreate, onDelete 
             <div key={split.id} className={`split-card${split.id === activeSplitId ? ' is-active' : ''}`}>
               <div className="split-card-head">
                 <div>
-                  <h3>{split.name}</h3>
+                  <div className="split-title-row">
+                    <h3>{split.name}</h3>
+                    {isFeatured(split) && editedSet.has(split.id) && (
+                      <span className="edited-badge">Edited</span>
+                    )}
+                    {split.custom && <span className="edited-badge custom">Custom</span>}
+                  </div>
                   <p className="split-desc">{split.description}</p>
                 </div>
                 <div className="split-card-actions">
-                  {split.custom && (
-                    <button className="btn-ghost danger small" onClick={() => onDelete(split.id)}>Delete</button>
-                  )}
                   {split.id === activeSplitId ? (
                     <span className="active-badge">✓ Active</span>
                   ) : (
@@ -126,6 +179,7 @@ export function Splits({ splits, activeSplitId, onSetActive, onCreate, onDelete 
                   )}
                 </div>
               </div>
+
               <div className="split-days">
                 {split.days.map(day => (
                   <div key={day.id} className="split-day">
@@ -136,17 +190,27 @@ export function Splits({ splits, activeSplitId, onSetActive, onCreate, onDelete 
                   </div>
                 ))}
               </div>
+
+              <div className="split-card-footer">
+                <button className="btn-ghost small" onClick={() => openEdit(split)}>✎ Edit</button>
+                {isFeatured(split) && editedSet.has(split.id) && (
+                  <button className="btn-ghost small" onClick={() => onReset(split.id)}>↺ Reset to default</button>
+                )}
+                {split.custom && (
+                  <button className="btn-ghost danger small" onClick={() => onDelete(split.id)}>Delete</button>
+                )}
+              </div>
             </div>
           ))}
         </div>
       </section>
 
       <section className="create-split">
-        {building ? (
+        {editor.mode !== 'closed' ? (
           <div className="split-card">
             <div className="split-card-head">
-              <h3>New Custom Split</h3>
-              <button className="btn-ghost small" onClick={() => setBuilding(false)}>Cancel</button>
+              <h3>{editor.mode === 'edit' ? 'Edit Split' : 'New Custom Split'}</h3>
+              <button className="btn-ghost small" onClick={closeEditor}>Cancel</button>
             </div>
 
             <label className="draft-name-label">
@@ -199,12 +263,12 @@ export function Splits({ splits, activeSplitId, onSetActive, onCreate, onDelete 
             <div className="draft-actions">
               <button className="btn-secondary" onClick={addDraftDay}>+ Add Day</button>
               <button className="btn-primary" onClick={saveDraft} disabled={!canSaveDraft}>
-                Save & Use Split
+                {editor.mode === 'edit' ? 'Save Changes' : 'Save & Use Split'}
               </button>
             </div>
           </div>
         ) : (
-          <button className="btn-secondary create-split-btn" onClick={() => { setBuilding(true); if (draftDays.length === 0) addDraftDay() }}>
+          <button className="btn-secondary create-split-btn" onClick={openCreate}>
             + Create Your Own Split
           </button>
         )}

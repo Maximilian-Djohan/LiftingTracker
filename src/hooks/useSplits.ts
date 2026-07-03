@@ -4,6 +4,9 @@ import { FEATURED_SPLITS } from '../data/splits'
 
 const CUSTOM_KEY = 'lifting-tracker-custom-splits'
 const ACTIVE_KEY = 'lifting-tracker-active-split'
+const OVERRIDE_KEY = 'lifting-tracker-split-overrides'
+
+const FEATURED_IDS = new Set(FEATURED_SPLITS.map(s => s.id))
 
 function load<T>(key: string, fallback: T): T {
   try {
@@ -16,6 +19,7 @@ function load<T>(key: string, fallback: T): T {
 
 export function useSplits() {
   const [customSplits, setCustomSplits] = useState<Split[]>(() => load(CUSTOM_KEY, []))
+  const [overrides, setOverrides] = useState<Record<string, Split>>(() => load(OVERRIDE_KEY, {}))
   const [activeSplitId, setActiveSplitId] = useState<string | null>(() => load(ACTIVE_KEY, null))
 
   useEffect(() => {
@@ -23,14 +27,39 @@ export function useSplits() {
   }, [customSplits])
 
   useEffect(() => {
+    localStorage.setItem(OVERRIDE_KEY, JSON.stringify(overrides))
+  }, [overrides])
+
+  useEffect(() => {
     localStorage.setItem(ACTIVE_KEY, JSON.stringify(activeSplitId))
   }, [activeSplitId])
 
-  const allSplits = [...FEATURED_SPLITS, ...customSplits]
+  // Featured splits show their edited version when one exists
+  const allSplits = [
+    ...FEATURED_SPLITS.map(s => overrides[s.id] ?? s),
+    ...customSplits,
+  ]
   const activeSplit = allSplits.find(s => s.id === activeSplitId) ?? null
+  const editedFeaturedIds = Object.keys(overrides)
 
   function addCustomSplit(split: Split) {
     setCustomSplits(prev => [...prev, split])
+  }
+
+  function updateSplit(split: Split) {
+    if (FEATURED_IDS.has(split.id)) {
+      setOverrides(prev => ({ ...prev, [split.id]: split }))
+    } else {
+      setCustomSplits(prev => prev.map(s => (s.id === split.id ? split : s)))
+    }
+  }
+
+  function resetSplit(id: string) {
+    setOverrides(prev => {
+      const next = { ...prev }
+      delete next[id]
+      return next
+    })
   }
 
   function deleteCustomSplit(id: string) {
@@ -38,5 +67,15 @@ export function useSplits() {
     if (activeSplitId === id) setActiveSplitId(null)
   }
 
-  return { allSplits, activeSplit, activeSplitId, setActiveSplitId, addCustomSplit, deleteCustomSplit }
+  return {
+    allSplits,
+    activeSplit,
+    activeSplitId,
+    editedFeaturedIds,
+    setActiveSplitId,
+    addCustomSplit,
+    updateSplit,
+    resetSplit,
+    deleteCustomSplit,
+  }
 }

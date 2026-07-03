@@ -1252,6 +1252,38 @@ textarea:focus {
   font-size: 1.05rem;
 }
 
+.split-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.edited-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.45rem;
+  border-radius: 20px;
+  background: rgba(245, 166, 35, 0.15);
+  color: var(--accent);
+}
+
+.edited-badge.custom {
+  background: var(--surface-2);
+  color: var(--text-dim);
+}
+
+.split-card-footer {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+}
+
 .split-desc {
   font-size: 0.85rem;
   color: var(--text-dim);

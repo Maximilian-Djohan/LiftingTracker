@@ -22,7 +22,17 @@ const SWIPE_RATIO = 2 // horizontal travel must dominate vertical scroll
 export default function App() {
   const { workouts, addWorkout, deleteWorkout } = useWorkouts()
   const { settings, updateSettings } = useSettings()
-  const { allSplits, activeSplit, activeSplitId, setActiveSplitId, addCustomSplit, deleteCustomSplit } = useSplits()
+  const {
+    allSplits,
+    activeSplit,
+    activeSplitId,
+    editedFeaturedIds,
+    setActiveSplitId,
+    addCustomSplit,
+    updateSplit,
+    resetSplit,
+    deleteCustomSplit,
+  } = useSplits()
   const [logging, setLogging] = useState(false)
   const [page, setPage] = useState<Page>('workouts')
   const [slideDir, setSlideDir] = useState<'forward' | 'back' | null>(null)
@@ -112,8 +122,11 @@ export default function App() {
             <Splits
               splits={allSplits}
               activeSplitId={activeSplitId}
+              editedFeaturedIds={editedFeaturedIds}
               onSetActive={setActiveSplitId}
               onCreate={addCustomSplit}
+              onUpdate={updateSplit}
+              onReset={resetSplit}
               onDelete={deleteCustomSplit}
             />
           )}
