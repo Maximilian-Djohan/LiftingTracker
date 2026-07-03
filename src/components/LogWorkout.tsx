@@ -28,10 +28,12 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
   const [name, setName] = useState('')
   const [date, setDate] = useState(today)
   const [exercises, setExercises] = useState<WorkoutExercise[]>([])
-  const [selectedExerciseId, setSelectedExerciseId] = useState(DEFAULT_EXERCISES[0].id)
   const [notes, setNotes] = useState('')
   const [unit, setUnit] = useState(defaultUnit)
   const [splitDay, setSplitDay] = useState<string | null>(null)
+  const [pickerOpen, setPickerOpen] = useState(true)
+  const [pickerSearch, setPickerSearch] = useState('')
+  const [pickerCategory, setPickerCategory] = useState<string>('all')
 
   // Most recent workout logged against the same split day (workouts are newest-first)
   const lastSameDay = splitDay ? workouts.find(w => w.splitDay === splitDay) ?? null : null
@@ -55,6 +57,7 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
             return ex ? [newWorkoutExercise(ex.id, ex.name, unit)] : []
           })
         )
+        setPickerOpen(false)
       }
     }
   }
@@ -68,10 +71,11 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
         sets: ex.sets.map(s => ({ ...s, id: crypto.randomUUID(), done: false })),
       }))
     )
+    setPickerOpen(false)
   }
 
-  function addExercise() {
-    const ex = DEFAULT_EXERCISES.find(e => e.id === selectedExerciseId)
+  function addExerciseById(id: string) {
+    const ex = DEFAULT_EXERCISES.find(e => e.id === id)
     if (!ex) return
     setExercises(prev => [...prev, newWorkoutExercise(ex.id, ex.name, unit)])
   }
@@ -126,7 +130,16 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
     onSave(workout)
   }
 
-  const categories = Array.from(new Set(DEFAULT_EXERCISES.map(e => e.category)))
+  const categories = ['all', ...Array.from(new Set(DEFAULT_EXERCISES.map(e => e.category)))]
+  const addedIds = new Set(exercises.map(e => e.exerciseId))
+  const q = pickerSearch.trim().toLowerCase()
+  const pickerResults = DEFAULT_EXERCISES.filter(
+    ex =>
+      (pickerCategory === 'all' || ex.category === pickerCategory) &&
+      (q === '' ||
+        ex.name.toLowerCase().includes(q) ||
+        ex.muscleGroups.some(m => m.toLowerCase().includes(q)))
+  )
   const doneSets = exercises.reduce((s, e) => s + e.sets.filter(x => x.done).length, 0)
   const totalSets = exercises.reduce((s, e) => s + e.sets.length, 0)
 
@@ -177,18 +190,59 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
         </label>
       </div>
 
-      <div className="add-exercise-row">
-        <select value={selectedExerciseId} onChange={e => setSelectedExerciseId(e.target.value)}>
-          {categories.map(cat => (
-            <optgroup key={cat} label={cat.charAt(0).toUpperCase() + cat.slice(1)}>
-              {DEFAULT_EXERCISES.filter(e => e.category === cat).map(e => (
-                <option key={e.id} value={e.id}>{e.name}</option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
-        <button className="btn-secondary" onClick={addExercise}>+ Add Exercise</button>
-      </div>
+      {pickerOpen ? (
+        <div className="exercise-picker">
+          <div className="picker-head">
+            <input
+              className="picker-search"
+              value={pickerSearch}
+              onChange={e => setPickerSearch(e.target.value)}
+              placeholder="Search exercises or muscles…"
+            />
+            <button className="btn-ghost small" onClick={() => setPickerOpen(false)}>Done ▴</button>
+          </div>
+
+          <div className="category-filters">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                className={`preset-chip${pickerCategory === cat ? ' active' : ''}`}
+                onClick={() => setPickerCategory(cat)}
+              >
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          {pickerResults.length === 0 ? (
+            <p className="empty-hint">No exercises match.</p>
+          ) : (
+            <div className="picker-grid">
+              {pickerResults.map(ex => {
+                const added = addedIds.has(ex.id)
+                return (
+                  <button
+                    key={ex.id}
+                    className={`picker-item${added ? ' added' : ''}`}
+                    onClick={() => addExerciseById(ex.id)}
+                    disabled={added}
+                  >
+                    <span className="picker-item-name">
+                      {ex.name}
+                      {added && <span className="picker-added">✓</span>}
+                    </span>
+                    <span className="picker-item-muscles">{ex.muscleGroups.slice(0, 3).join(' · ')}</span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      ) : (
+        <button className="btn-secondary add-exercise-toggle" onClick={() => setPickerOpen(true)}>
+          + Add Exercise
+        </button>
+      )}
 
       {totalSets > 0 && (
         <div className="set-progress">
@@ -267,7 +321,7 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
         ))}
       </div>
 
-      {exercises.length === 0 && (
+      {exercises.length === 0 && !pickerOpen && (
         <p className="empty-hint">
           {activeSplit
             ? 'Pick a split day above or add exercises to start logging.'

@@ -473,14 +473,81 @@ textarea:focus {
   min-width: 120px;
 }
 
-.add-exercise-row {
-  display: flex;
-  gap: 0.6rem;
+/* Exercise picker in the log form */
+.exercise-picker {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
   margin-bottom: 1.2rem;
 }
 
-.add-exercise-row select {
+.picker-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+.picker-search {
   flex: 1;
+}
+
+.exercise-picker .category-filters {
+  margin-bottom: 0.9rem;
+}
+
+.picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.picker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  color: var(--text);
+}
+
+.picker-item:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.picker-item.added {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.picker-item-name {
+  font-weight: 600;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.picker-added {
+  color: var(--accent);
+}
+
+.picker-item-muscles {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.add-exercise-toggle {
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 1.2rem;
 }
 
 .exercises-list {
