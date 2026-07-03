@@ -18,12 +18,17 @@
   padding: 0;
 }
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* Hide scrollbars app-wide (scrolling still works) */
@@ -83,61 +88,44 @@ body.theme-light .settings-overlay {
 .app {
   max-width: 900px;
   margin: 0 auto;
-  padding: 1.5rem;
-  padding-bottom: calc(var(--nav-height) + 2rem);
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Page slide transitions */
-.app-main {
-  /* Let vertical scrolling work normally; we only interpret horizontal swipes */
-  touch-action: pan-y;
+/* Swipeable pager */
+.pager-viewport {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.pager-track {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+}
+
+.pager-page {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
   overflow-x: hidden;
-}
-
-.page-view.slide-forward,
-.page-view.slide-back {
-  will-change: transform, opacity;
-}
-
-.page-view.slide-forward {
-  animation: page-in-forward 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.page-view.slide-back {
-  animation: page-in-back 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes page-in-forward {
-  from {
-    opacity: 0.5;
-    transform: translateX(26px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes page-in-back {
-  from {
-    opacity: 0.5;
-    transform: translateX(-26px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  padding: 0.5rem 1.25rem calc(var(--nav-height) + 2rem);
+  -webkit-overflow-scrolling: touch;
 }
 
 .app-header {
   /* Full-bleed: title hugs the left screen edge, settings the right */
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  padding: 0 1.25rem;
+  padding: 1rem 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
 }
 
 .brand {

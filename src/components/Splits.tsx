@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Split, SplitDay } from '../types'
 import { DEFAULT_EXERCISES } from '../data/exercises'
 
@@ -41,6 +41,13 @@ export function Splits({
   const [editor, setEditor] = useState<Editor>({ mode: 'closed' })
   const [draftName, setDraftName] = useState('')
   const [draftDays, setDraftDays] = useState<DraftDay[]>([])
+  const editorRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (editor.mode !== 'closed') {
+      editorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [editor])
 
   const activeSplit = splits.find(s => s.id === activeSplitId) ?? null
   const editedSet = new Set(editedFeaturedIds)
@@ -205,7 +212,7 @@ export function Splits({
         </div>
       </section>
 
-      <section className="create-split">
+      <section className="create-split" ref={editorRef}>
         {editor.mode !== 'closed' ? (
           <div className="split-card">
             <div className="split-card-head">
