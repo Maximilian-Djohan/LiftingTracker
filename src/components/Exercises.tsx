@@ -6,7 +6,11 @@ import { BodyMap } from './BodyMap'
 const CATEGORIES = ['all', 'push', 'pull', 'legs', 'core'] as const
 type Category = (typeof CATEGORIES)[number]
 
-export function Exercises() {
+interface Props {
+  showBodyMap: boolean
+}
+
+export function Exercises({ showBodyMap }: Props) {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<Category>('all')
   const [region, setRegion] = useState<string | null>(null)
@@ -31,7 +35,7 @@ export function Exercises() {
     <div className="exercises-page">
       <h2>Explore Exercises</h2>
 
-      <BodyMap selected={region} onSelect={setRegion} />
+      {showBodyMap && <BodyMap selected={region} onSelect={setRegion} />}
 
       {region && (
         <div className="region-filter-bar">

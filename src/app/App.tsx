@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { useSettings } from '../hooks/useSettings'
 import { LogWorkout } from '../components/LogWorkout'
@@ -17,6 +17,10 @@ export default function App() {
   const { settings, updateSettings } = useSettings()
   const [logging, setLogging] = useState(false)
   const [page, setPage] = useState<Page>('workouts')
+
+  useEffect(() => {
+    document.body.classList.toggle('theme-light', settings.theme === 'light')
+  }, [settings.theme])
 
   return (
     <div className="app">
@@ -66,7 +70,7 @@ export default function App() {
           )
         )}
 
-        {page === 'exercises' && <Exercises />}
+        {page === 'exercises' && <Exercises showBodyMap={settings.showBodyMap} />}
 
         {page === 'nutrition' && <Nutrition />}
       </main>

@@ -4,9 +4,11 @@ const STORAGE_KEY = 'lifting-tracker-settings'
 
 export interface Settings {
   defaultUnit: 'kg' | 'lbs'
+  theme: 'dark' | 'light'
+  showBodyMap: boolean
 }
 
-const DEFAULT_SETTINGS: Settings = { defaultUnit: 'kg' }
+const DEFAULT_SETTINGS: Settings = { defaultUnit: 'kg', theme: 'dark', showBodyMap: true }
 
 export function useSettings() {
   const [settings, setSettings] = useState<Settings>(() => {

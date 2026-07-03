@@ -23,6 +23,47 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* Light theme */
+body.theme-light {
+  --bg: #f2f4f8;
+  --surface: #ffffff;
+  --surface-2: #e9edf3;
+  --border: #d3d9e3;
+  --text: #1c2028;
+  --text-dim: #5d6674;
+}
+
+body.theme-light .bottom-nav {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+body.theme-light .stat-value {
+  color: var(--text);
+}
+
+body.theme-light .body-poly {
+  fill: #ccd3de;
+  stroke: rgba(60, 80, 120, 0.25);
+}
+
+body.theme-light .body-poly.clickable {
+  fill: #a9b5c9;
+}
+
+body.theme-light .body-poly.clickable:hover {
+  fill: #8fa0bd;
+}
+
+body.theme-light .timer-fab {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+body.theme-light .timer-overlay,
+body.theme-light .settings-overlay {
+  background: rgba(0, 0, 0, 0.35);
 }
 
 .app {
@@ -33,6 +74,10 @@ body {
 }
 
 .app-header {
+  /* Full-bleed: title hugs the left screen edge, settings the right */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: 0 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -791,9 +836,9 @@ textarea:focus {
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 4.5rem 1.5rem 1rem;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
   z-index: 100;
   animation: overlay-fade 0.18s ease-out;
 }
@@ -804,9 +849,19 @@ textarea:focus {
   border-radius: var(--radius);
   padding: 1.2rem 1.4rem;
   width: 100%;
-  max-width: 360px;
-  transform-origin: top right;
-  animation: timer-pop 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.15);
+  max-width: 380px;
+  animation: pop-center 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.15);
+}
+
+@keyframes pop-center {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .settings-head {
@@ -825,6 +880,12 @@ textarea:focus {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.settings-row + .settings-row {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
 }
 
 .settings-row-text {

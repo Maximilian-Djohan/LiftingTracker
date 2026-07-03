@@ -43,6 +43,48 @@ export function SettingsMenu({ settings, onChange }: Props) {
                 </button>
               </div>
             </div>
+
+            <div className="settings-row">
+              <div className="settings-row-text">
+                <span className="settings-row-label">Theme</span>
+                <span className="settings-row-hint">App colour scheme</span>
+              </div>
+              <div className="unit-toggle">
+                <button
+                  className={`unit-option${settings.theme === 'dark' ? ' active' : ''}`}
+                  onClick={() => onChange({ theme: 'dark' })}
+                >
+                  Dark
+                </button>
+                <button
+                  className={`unit-option${settings.theme === 'light' ? ' active' : ''}`}
+                  onClick={() => onChange({ theme: 'light' })}
+                >
+                  Light
+                </button>
+              </div>
+            </div>
+
+            <div className="settings-row">
+              <div className="settings-row-text">
+                <span className="settings-row-label">Body map</span>
+                <span className="settings-row-hint">Clickable figure on the Exercises page</span>
+              </div>
+              <div className="unit-toggle">
+                <button
+                  className={`unit-option${settings.showBodyMap ? ' active' : ''}`}
+                  onClick={() => onChange({ showBodyMap: true })}
+                >
+                  On
+                </button>
+                <button
+                  className={`unit-option${!settings.showBodyMap ? ' active' : ''}`}
+                  onClick={() => onChange({ showBodyMap: false })}
+                >
+                  Off
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
