@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { useSettings } from '../hooks/useSettings'
 import { LogWorkout } from '../components/LogWorkout'
@@ -12,15 +12,47 @@ import './styles.css'
 
 type Page = 'workouts' | 'exercises' | 'nutrition'
 
+const PAGES: Page[] = ['workouts', 'exercises', 'nutrition']
+
+const SWIPE_MIN_X = 60 // px of horizontal travel to count as a swipe
+const SWIPE_RATIO = 2 // horizontal travel must dominate vertical scroll
+
 export default function App() {
   const { workouts, addWorkout, deleteWorkout } = useWorkouts()
   const { settings, updateSettings } = useSettings()
   const [logging, setLogging] = useState(false)
   const [page, setPage] = useState<Page>('workouts')
+  const [slideDir, setSlideDir] = useState<'forward' | 'back' | null>(null)
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
 
   useEffect(() => {
     document.body.classList.toggle('theme-light', settings.theme === 'light')
   }, [settings.theme])
+
+  function goToPage(next: Page) {
+    if (next === page) return
+    setSlideDir(PAGES.indexOf(next) > PAGES.indexOf(page) ? 'forward' : 'back')
+    setPage(next)
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    const start = touchStart.current
+    touchStart.current = null
+    // Don't swipe away from a half-filled workout form
+    if (!start || logging) return
+
+    const dx = e.changedTouches[0].clientX - start.x
+    const dy = e.changedTouches[0].clientY - start.y
+    if (Math.abs(dx) < SWIPE_MIN_X || Math.abs(dx) < Math.abs(dy) * SWIPE_RATIO) return
+
+    const idx = PAGES.indexOf(page)
+    const next = dx < 0 ? PAGES[idx + 1] : PAGES[idx - 1]
+    if (next) goToPage(next)
+  }
 
   return (
     <div className="app">
@@ -31,68 +63,70 @@ export default function App() {
         <SettingsMenu settings={settings} onChange={updateSettings} />
       </header>
 
-      <main className="app-main">
-        {page === 'workouts' && (
-          logging ? (
-            <LogWorkout
-              defaultUnit={settings.defaultUnit}
-              onSave={workout => {
-                addWorkout(workout)
-                setLogging(false)
-              }}
-              onCancel={() => setLogging(false)}
-            />
-          ) : (
-            <>
-              <div className="new-workout-hero">
-                <button className="btn-hero" onClick={() => setLogging(true)}>
-                  + New Workout
-                </button>
-              </div>
+      <main className="app-main" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <div key={page} className={`page-view${slideDir ? ` slide-${slideDir}` : ''}`}>
+          {page === 'workouts' && (
+            logging ? (
+              <LogWorkout
+                defaultUnit={settings.defaultUnit}
+                onSave={workout => {
+                  addWorkout(workout)
+                  setLogging(false)
+                }}
+                onCancel={() => setLogging(false)}
+              />
+            ) : (
+              <>
+                <div className="new-workout-hero">
+                  <button className="btn-hero" onClick={() => setLogging(true)}>
+                    + New Workout
+                  </button>
+                </div>
 
-              <Stats workouts={workouts} />
+                <Stats workouts={workouts} />
 
-              <section className="history">
-                <h2>History</h2>
-                {workouts.length === 0 ? (
-                  <div className="empty-state">
-                    <p>No workouts yet — hit “New Workout” to log your first session.</p>
-                  </div>
-                ) : (
-                  <div className="workout-grid">
-                    {workouts.map(w => (
-                      <WorkoutCard key={w.id} workout={w} onDelete={deleteWorkout} />
-                    ))}
-                  </div>
-                )}
-              </section>
-            </>
-          )
-        )}
+                <section className="history">
+                  <h2>History</h2>
+                  {workouts.length === 0 ? (
+                    <div className="empty-state">
+                      <p>No workouts yet — hit “New Workout” to log your first session.</p>
+                    </div>
+                  ) : (
+                    <div className="workout-grid">
+                      {workouts.map(w => (
+                        <WorkoutCard key={w.id} workout={w} onDelete={deleteWorkout} />
+                      ))}
+                    </div>
+                  )}
+                </section>
+              </>
+            )
+          )}
 
-        {page === 'exercises' && <Exercises showBodyMap={settings.showBodyMap} />}
+          {page === 'exercises' && <Exercises showBodyMap={settings.showBodyMap} />}
 
-        {page === 'nutrition' && <Nutrition />}
+          {page === 'nutrition' && <Nutrition />}
+        </div>
       </main>
 
       <nav className="bottom-nav">
         <button
           className={`nav-item${page === 'workouts' ? ' active' : ''}`}
-          onClick={() => setPage('workouts')}
+          onClick={() => goToPage('workouts')}
         >
           <span className="nav-icon">🏋️</span>
           Workouts
         </button>
         <button
           className={`nav-item${page === 'exercises' ? ' active' : ''}`}
-          onClick={() => setPage('exercises')}
+          onClick={() => goToPage('exercises')}
         >
           <span className="nav-icon">📖</span>
           Exercises
         </button>
         <button
           className={`nav-item${page === 'nutrition' ? ' active' : ''}`}
-          onClick={() => setPage('nutrition')}
+          onClick={() => goToPage('nutrition')}
         >
           <span className="nav-icon">🍎</span>
           Nutrition

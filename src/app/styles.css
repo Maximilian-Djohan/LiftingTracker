@@ -73,6 +73,43 @@ body.theme-light .settings-overlay {
   padding-bottom: calc(var(--nav-height) + 2rem);
 }
 
+/* Page slide transitions */
+.app-main {
+  /* Let vertical scrolling work normally; we only interpret horizontal swipes */
+  touch-action: pan-y;
+  overflow-x: hidden;
+}
+
+.page-view.slide-forward {
+  animation: page-in-forward 0.28s cubic-bezier(0.25, 0.8, 0.35, 1);
+}
+
+.page-view.slide-back {
+  animation: page-in-back 0.28s cubic-bezier(0.25, 0.8, 0.35, 1);
+}
+
+@keyframes page-in-forward {
+  from {
+    opacity: 0;
+    transform: translateX(56px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes page-in-back {
+  from {
+    opacity: 0;
+    transform: translateX(-56px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .app-header {
   /* Full-bleed: title hugs the left screen edge, settings the right */
   width: 100vw;
