@@ -6,13 +6,15 @@ import { WorkoutCard } from '../components/WorkoutCard'
 import { Stats } from '../components/Stats'
 import { Nutrition } from '../components/Nutrition'
 import { Exercises } from '../components/Exercises'
+import { Splits } from '../components/Splits'
 import { SettingsMenu } from '../components/SettingsMenu'
 import { RestTimerWidget } from '../components/RestTimerWidget'
+import { useSplits } from '../hooks/useSplits'
 import './styles.css'
 
-type Page = 'workouts' | 'exercises' | 'nutrition'
+type Page = 'workouts' | 'splits' | 'exercises' | 'nutrition'
 
-const PAGES: Page[] = ['workouts', 'exercises', 'nutrition']
+const PAGES: Page[] = ['workouts', 'splits', 'exercises', 'nutrition']
 
 const SWIPE_MIN_X = 60 // px of horizontal travel to count as a swipe
 const SWIPE_RATIO = 2 // horizontal travel must dominate vertical scroll
@@ -20,6 +22,7 @@ const SWIPE_RATIO = 2 // horizontal travel must dominate vertical scroll
 export default function App() {
   const { workouts, addWorkout, deleteWorkout } = useWorkouts()
   const { settings, updateSettings } = useSettings()
+  const { allSplits, activeSplit, activeSplitId, setActiveSplitId, addCustomSplit, deleteCustomSplit } = useSplits()
   const [logging, setLogging] = useState(false)
   const [page, setPage] = useState<Page>('workouts')
   const [slideDir, setSlideDir] = useState<'forward' | 'back' | null>(null)
@@ -69,6 +72,8 @@ export default function App() {
             logging ? (
               <LogWorkout
                 defaultUnit={settings.defaultUnit}
+                activeSplit={activeSplit}
+                workouts={workouts}
                 onSave={workout => {
                   addWorkout(workout)
                   setLogging(false)
@@ -103,6 +108,16 @@ export default function App() {
             )
           )}
 
+          {page === 'splits' && (
+            <Splits
+              splits={allSplits}
+              activeSplitId={activeSplitId}
+              onSetActive={setActiveSplitId}
+              onCreate={addCustomSplit}
+              onDelete={deleteCustomSplit}
+            />
+          )}
+
           {page === 'exercises' && <Exercises showBodyMap={settings.showBodyMap} />}
 
           {page === 'nutrition' && <Nutrition />}
@@ -116,6 +131,13 @@ export default function App() {
         >
           <span className="nav-icon">🏋️</span>
           Workouts
+        </button>
+        <button
+          className={`nav-item${page === 'splits' ? ' active' : ''}`}
+          onClick={() => goToPage('splits')}
+        >
+          <span className="nav-icon">📅</span>
+          Splits
         </button>
         <button
           className={`nav-item${page === 'exercises' ? ' active' : ''}`}

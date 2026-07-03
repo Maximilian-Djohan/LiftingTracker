@@ -10,6 +10,7 @@ export interface WorkoutSet {
   weight: number
   reps: number
   unit: 'kg' | 'lbs'
+  done?: boolean
 }
 
 export interface WorkoutExercise {
@@ -27,6 +28,22 @@ export interface Workout {
   exercises: WorkoutExercise[]
   durationMinutes?: number
   notes?: string
+  /** Name of the split day this workout was logged against, e.g. "Pull" */
+  splitDay?: string
+}
+
+export interface SplitDay {
+  id: string
+  name: string
+  exerciseIds: string[]
+}
+
+export interface Split {
+  id: string
+  name: string
+  description: string
+  days: SplitDay[]
+  custom?: boolean
 }
 
 export interface FoodEntry {

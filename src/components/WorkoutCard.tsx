@@ -17,7 +17,10 @@ export function WorkoutCard({ workout, onDelete }: Props) {
     <div className="workout-card">
       <div className="workout-card-header">
         <div>
-          <h3>{workout.name}</h3>
+          <div className="workout-title-row">
+            <h3>{workout.name}</h3>
+            {workout.splitDay && <span className="split-badge">{workout.splitDay}</span>}
+          </div>
           <span className="workout-date">{formatDate(workout.date)}</span>
         </div>
         <button className="btn-ghost danger small" onClick={() => onDelete(workout.id)}>Delete</button>
