@@ -423,6 +423,126 @@ button {
   padding: 1.5rem;
 }
 
+.log-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.log-head h2 {
+  font-size: 1.2rem;
+}
+
+.log-sub {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* Step 1: day picker */
+.day-pick-prompt {
+  color: var(--text-dim);
+  margin-bottom: 1rem;
+}
+
+.day-pick-prompt strong {
+  color: var(--text);
+}
+
+.day-pick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.7rem;
+}
+
+.day-pick-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  text-align: left;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  color: var(--text);
+}
+
+.day-pick-btn:hover {
+  border-color: var(--accent);
+}
+
+.day-pick-btn.other {
+  border-style: dashed;
+}
+
+.day-pick-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.day-pick-sub {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+.no-split-warning {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.6rem;
+  background: rgba(245, 166, 35, 0.08);
+  border: 1px solid rgba(245, 166, 35, 0.35);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+
+.warn-icon {
+  font-size: 1.8rem;
+}
+
+.warn-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.warn-text {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  max-width: 340px;
+}
+
+.warn-text strong {
+  color: var(--text);
+}
+
+.no-split-warning .btn-primary {
+  margin-top: 0.4rem;
+}
+
+/* Drag-to-reorder */
+.exercise-grip {
+  cursor: grab;
+  touch-action: none;
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 0.5rem 0 0;
+  user-select: none;
+}
+
+.exercise-grip:active {
+  cursor: grabbing;
+}
+
+.exercise-card.dragging {
+  opacity: 0.9;
+  border-color: var(--accent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
 .form-row {
   display: flex;
   gap: 1rem;
@@ -554,13 +674,14 @@ textarea:focus {
 
 .exercise-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 0.3rem;
   margin-bottom: 0.6rem;
 }
 
 .exercise-header h3 {
   font-size: 1rem;
+  flex: 1;
 }
 
 .sets-table {
