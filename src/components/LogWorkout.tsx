@@ -98,7 +98,13 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
 
   function addSet(exerciseId: string) {
     setExercises(prev =>
-      prev.map(e => (e.id === exerciseId ? { ...e, sets: [...e.sets, newSet(unit)] } : e))
+      prev.map(e => {
+        if (e.id !== exerciseId) return e
+        const last = e.sets[e.sets.length - 1]
+        const set = newSet(unit)
+        if (last) set.weight = last.weight // carry over the previous set's weight
+        return { ...e, sets: [...e.sets, set] }
+      })
     )
   }
 
@@ -329,8 +335,9 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
                       <input
                         type="number"
                         min="0"
+                        step="0.5"
                         value={set.reps || ''}
-                        onChange={e => updateSet(ex.id, set.id, 'reps', parseInt(e.target.value) || 0)}
+                        onChange={e => updateSet(ex.id, set.id, 'reps', parseFloat(e.target.value) || 0)}
                         placeholder="0"
                       />
                     </td>
