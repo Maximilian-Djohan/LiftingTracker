@@ -1,6 +1,28 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Split, Workout, WorkoutExercise, WorkoutSet } from '../types'
 import { DEFAULT_EXERCISES } from '../data/exercises'
+
+const DRAFT_KEY = 'lifting-tracker-workout-draft'
+
+interface Draft {
+  name: string
+  date: string
+  exercises: WorkoutExercise[]
+  notes: string
+  splitDay: string | null
+}
+
+function loadDraft(): Draft | null {
+  try {
+    const stored = localStorage.getItem(DRAFT_KEY)
+    if (!stored) return null
+    const draft = JSON.parse(stored) as Draft
+    // Only restore a draft that actually has logged exercises
+    return draft.exercises?.length ? draft : null
+  } catch {
+    return null
+  }
+}
 
 interface Props {
   onSave: (workout: Workout) => void
@@ -28,12 +50,14 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
   const today = new Date().toISOString().split('T')[0]
   const unit = defaultUnit
 
-  const [step, setStep] = useState<'day' | 'log'>('day')
-  const [name, setName] = useState('')
-  const [date, setDate] = useState(today)
-  const [exercises, setExercises] = useState<WorkoutExercise[]>([])
-  const [notes, setNotes] = useState('')
-  const [splitDay, setSplitDay] = useState<string | null>(null)
+  // Restore an unsaved in-progress workout if one was left behind
+  const [initialDraft] = useState(loadDraft)
+  const [step, setStep] = useState<'day' | 'log'>(initialDraft ? 'log' : 'day')
+  const [name, setName] = useState(initialDraft?.name ?? '')
+  const [date, setDate] = useState(initialDraft?.date ?? today)
+  const [exercises, setExercises] = useState<WorkoutExercise[]>(initialDraft?.exercises ?? [])
+  const [notes, setNotes] = useState(initialDraft?.notes ?? '')
+  const [splitDay, setSplitDay] = useState<string | null>(initialDraft?.splitDay ?? null)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [pickerSearch, setPickerSearch] = useState('')
   const [pickerCategory, setPickerCategory] = useState<string>('all')
@@ -44,6 +68,22 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
   const exercisesRef = useRef(exercises)
   exercisesRef.current = exercises
   const cardRefs = useRef(new Map<string, HTMLDivElement>())
+
+  // Continuously persist the in-progress workout so leaving the site never loses it
+  useEffect(() => {
+    if (step !== 'log') return
+    const draft: Draft = { name, date, exercises, notes, splitDay }
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+  }, [step, name, date, exercises, notes, splitDay])
+
+  function clearDraft() {
+    localStorage.removeItem(DRAFT_KEY)
+  }
+
+  function handleCancel() {
+    clearDraft()
+    onCancel()
+  }
 
   const lastSameDay = splitDay ? workouts.find(w => w.splitDay === splitDay) ?? null : null
 
@@ -184,6 +224,7 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
       notes: notes.trim() || undefined,
       splitDay: splitDay ?? undefined,
     }
+    clearDraft()
     onSave(workout)
   }
 
@@ -193,7 +234,7 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
       <div className="log-workout">
         <div className="log-head">
           <h2>New Workout</h2>
-          <button className="btn-ghost" onClick={onCancel}>Cancel</button>
+          <button className="btn-ghost" onClick={handleCancel}>Cancel</button>
         </div>
 
         {activeSplit ? (
@@ -250,7 +291,7 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
           <h2>{splitDay ? `${splitDay} Day` : 'Workout'}</h2>
           {splitDay && activeSplit && <span className="log-sub">{activeSplit.name}</span>}
         </div>
-        <button className="btn-ghost" onClick={onCancel}>Cancel</button>
+        <button className="btn-ghost" onClick={handleCancel}>Cancel</button>
       </div>
 
       {lastSameDay && (
