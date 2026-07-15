@@ -159,7 +159,7 @@ export function Splits({
             </div>
           </div>
         ) : (
-          <p className="empty-hint">No split selected — pick one below or create your own.</p>
+          <p className="empty-hint">No split selected. Pick one below or create your own.</p>
         )}
       </section>
 
@@ -172,6 +172,7 @@ export function Splits({
                 <div>
                   <div className="split-title-row">
                     <h3>{split.name}</h3>
+                    {split.recommended && <span className="edited-badge recommended">Recommended</span>}
                     {isFeatured(split) && editedSet.has(split.id) && (
                       <span className="edited-badge">Edited</span>
                     )}

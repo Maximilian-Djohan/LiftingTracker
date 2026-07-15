@@ -345,7 +345,7 @@ export function LogWorkout({
     const workout: Workout = {
       id: crypto.randomUUID(),
       date,
-      name: name.trim() || `Workout – ${date}`,
+      name: name.trim() || `Workout ${date}`,
       exercises,
       notes: notes.trim() || undefined,
       splitDay: splitDay ?? undefined,
@@ -434,7 +434,7 @@ export function LogWorkout({
         <div className="form-row">
           <label>
             Name
-            <input value={name} onChange={e => setName(e.target.value)} placeholder={`Workout – ${date}`} />
+            <input value={name} onChange={e => setName(e.target.value)} placeholder={`Workout ${date}`} />
           </label>
           <label>
             Date

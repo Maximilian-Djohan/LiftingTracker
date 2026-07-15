@@ -16,7 +16,7 @@ function beep() {
     osc.stop(ctx.currentTime + 0.25)
     osc.onended = () => ctx.close()
   } catch {
-    // audio not available — ignore
+    // audio not available, ignore
   }
 }
 

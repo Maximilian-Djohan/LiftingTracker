@@ -1527,6 +1527,11 @@ textarea:focus {
   color: var(--text-dim);
 }
 
+.edited-badge.recommended {
+  background: color-mix(in srgb, var(--series-2) 15%, transparent);
+  color: var(--series-2);
+}
+
 .split-card-footer {
   display: flex;
   gap: 0.4rem;

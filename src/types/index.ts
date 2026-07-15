@@ -54,6 +54,7 @@ export interface Split {
   description: string
   days: SplitDay[]
   custom?: boolean
+  recommended?: boolean
 }
 
 export interface FoodEntry {

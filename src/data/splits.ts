@@ -2,6 +2,43 @@ import type { Split } from '../types'
 
 export const FEATURED_SPLITS: Split[] = [
   {
+    id: 'maxs-ppl',
+    name: "Max's PPL",
+    description: 'Machine-focused push pull legs built around stable, high-tension movements.',
+    recommended: true,
+    days: [
+      {
+        id: 'maxs-ppl-push',
+        name: 'Push',
+        exerciseIds: [
+          'reverse-grip-incline-smith-machine-bench-press',
+          'pec-deck',
+          'lateral-raise',
+          'machine-shoulder-press',
+          'unilateral-tricep-pushdown',
+          'jm-press',
+        ],
+      },
+      {
+        id: 'maxs-ppl-pull',
+        name: 'Pull',
+        exerciseIds: [
+          'kelso-shrug',
+          'lat-pulldown',
+          'close-grip-machine-row',
+          'cable-rear-delt-fly',
+          'recline-curl',
+          'cable-curl',
+        ],
+      },
+      {
+        id: 'maxs-ppl-legs',
+        name: 'Legs',
+        exerciseIds: ['hack-squat', 'leg-extension', 'romanian-deadlift', 'leg-curl'],
+      },
+    ],
+  },
+  {
     id: 'ppl',
     name: 'Push Pull Legs',
     description: 'The classic 3-day rotation: pushing muscles, pulling muscles, then legs.',

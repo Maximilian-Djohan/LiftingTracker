@@ -170,7 +170,7 @@ export default function App() {
       <h2>History</h2>
       {workouts.length === 0 ? (
         <div className="empty-state">
-          <p>No workouts yet — hit “New Workout” to log your first session.</p>
+          <p>No workouts yet. Hit “New Workout” to log your first session.</p>
         </div>
       ) : (
         <div className="workout-grid">

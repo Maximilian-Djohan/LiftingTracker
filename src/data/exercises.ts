@@ -23,6 +23,7 @@ export const DEFAULT_EXERCISES: Exercise[] = [
   { id: 'decline-dumbbell-bench-press', name: 'Decline Dumbbell Bench Press', category: 'chest', muscleGroups: ['lower chest', 'triceps'] },
   { id: 'smith-machine-bench-press', name: 'Smith Machine Bench Press', category: 'chest', muscleGroups: ['chest', 'triceps', 'front delts'] },
   { id: 'incline-smith-machine-bench-press', name: 'Incline Smith Machine Bench Press', category: 'chest', muscleGroups: ['upper chest', 'front delts', 'triceps'] },
+  { id: 'reverse-grip-incline-smith-machine-bench-press', name: 'Reverse Grip Incline Smith Machine Bench Press', category: 'chest', muscleGroups: ['upper chest', 'triceps', 'front delts'] },
   { id: 'decline-smith-machine-bench-press', name: 'Decline Smith Machine Bench Press', category: 'chest', muscleGroups: ['lower chest', 'triceps'] },
   { id: 'machine-chest-press', name: 'Machine Chest Press', category: 'chest', muscleGroups: ['chest', 'triceps', 'front delts'] },
   { id: 'incline-machine-chest-press', name: 'Incline Machine Chest Press', category: 'chest', muscleGroups: ['upper chest', 'front delts', 'triceps'] },
@@ -46,6 +47,8 @@ export const DEFAULT_EXERCISES: Exercise[] = [
   { id: 'barbell-chest-supported-row', name: 'Barbell Chest-Supported Row', category: 'back', muscleGroups: ['upper back', 'rear delts', 'biceps'] },
   { id: 't-bar-row', name: 'T-Bar Row', category: 'back', muscleGroups: ['back', 'biceps', 'rear delts'] },
   { id: 'machine-row', name: 'Machine Row', category: 'back', muscleGroups: ['back', 'biceps', 'rear delts'] },
+  { id: 'wide-grip-machine-row', name: 'Wide Grip Machine Row', category: 'back', muscleGroups: ['upper back', 'rear delts', 'biceps'] },
+  { id: 'close-grip-machine-row', name: 'Close Grip Machine Row', category: 'back', muscleGroups: ['back', 'biceps'] },
   { id: 'lat-pulldown', name: 'Wide Grip Lat Pulldown', category: 'back', muscleGroups: ['back', 'biceps', 'forearms'] },
   { id: 'close-grip-lat-pulldown', name: 'Close Grip Lat Pulldown', category: 'back', muscleGroups: ['back', 'biceps', 'forearms'] },
   { id: 'pull-up', name: 'Pull Up', category: 'back', muscleGroups: ['back', 'biceps', 'forearms', 'core'] },
@@ -73,6 +76,7 @@ export const DEFAULT_EXERCISES: Exercise[] = [
   { id: 'machine-front-raise', name: 'Machine Front Raise', category: 'shoulders', muscleGroups: ['front delts'] },
   { id: 'upright-row', name: 'Upright Row', category: 'shoulders', muscleGroups: ['side delts', 'traps', 'biceps'] },
   { id: 'rear-delt-fly', name: 'Rear Delt Fly', category: 'shoulders', muscleGroups: ['rear delts', 'upper back'] },
+  { id: 'cable-rear-delt-fly', name: 'Cable Rear Delt Fly', category: 'shoulders', muscleGroups: ['rear delts', 'upper back'] },
   { id: 'face-pull', name: 'Face Pull', category: 'shoulders', muscleGroups: ['rear delts', 'upper back'] },
 
   // Biceps
