@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Exercise, Split, Workout, WorkoutExercise, WorkoutSet } from '../types'
+import { CATEGORY_LABELS } from '../data/exercises'
 
 const DRAFT_KEY = 'lifting-tracker-workout-draft'
 
@@ -558,7 +559,7 @@ export function LogWorkout({
                 className={`preset-chip${pickerCategory === cat ? ' active' : ''}`}
                 onClick={() => setPickerCategory(cat)}
               >
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                {cat === 'all' ? 'All' : CATEGORY_LABELS[cat as Exercise['category']] ?? cat}
               </button>
             ))}
           </div>

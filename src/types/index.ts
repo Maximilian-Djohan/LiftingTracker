@@ -1,7 +1,17 @@
 export interface Exercise {
   id: string
   name: string
-  category: 'push' | 'pull' | 'legs' | 'core' | 'cardio' | 'other'
+  category:
+    | 'chest'
+    | 'back'
+    | 'shoulders'
+    | 'biceps'
+    | 'triceps'
+    | 'quads'
+    | 'hamstrings-glutes'
+    | 'calves'
+    | 'core'
+    | 'other'
   muscleGroups: string[]
 }
 

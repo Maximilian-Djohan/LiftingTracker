@@ -1,9 +1,21 @@
 import { useState } from 'react'
 import type { Exercise } from '../types'
+import { CATEGORY_LABELS } from '../data/exercises'
 import { REGION_MATCHERS } from '../data/bodyMap'
 import { BodyMap } from './BodyMap'
 
-const CATEGORIES = ['all', 'push', 'pull', 'legs', 'core'] as const
+const CATEGORIES = [
+  'all',
+  'chest',
+  'back',
+  'shoulders',
+  'biceps',
+  'triceps',
+  'quads',
+  'hamstrings-glutes',
+  'calves',
+  'core',
+] as const
 type Category = (typeof CATEGORIES)[number]
 
 interface Props {
@@ -72,7 +84,7 @@ export function Exercises({ showBodyMap, minimalist, exercises, onRemoveCustom, 
             className={`preset-chip${category === cat ? ' active' : ''}`}
             onClick={() => setCategory(cat)}
           >
-            {cat.charAt(0).toUpperCase() + cat.slice(1)}
+            {cat === 'all' ? 'All' : CATEGORY_LABELS[cat]}
           </button>
         ))}
       </div>
@@ -109,7 +121,7 @@ export function Exercises({ showBodyMap, minimalist, exercises, onRemoveCustom, 
               <div className="exercise-tile-head">
                 <h3>{ex.name}</h3>
                 <span className={`category-badge ${ex.category}`}>
-                  {isCustom(ex) ? 'custom' : ex.category}
+                  {isCustom(ex) ? 'custom' : CATEGORY_LABELS[ex.category]}
                 </span>
                 {isCustom(ex) && (
                   <button

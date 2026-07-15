@@ -1347,26 +1347,31 @@ textarea:focus {
   white-space: nowrap;
 }
 
-.category-badge.push {
+.category-badge.chest,
+.category-badge.triceps {
   background: color-mix(in srgb, var(--series-1) 15%, transparent);
   color: var(--series-1);
 }
 
-.category-badge.pull {
+.category-badge.back,
+.category-badge.quads {
   background: color-mix(in srgb, var(--series-2) 15%, transparent);
   color: var(--series-2);
 }
 
-.category-badge.legs {
-  background: color-mix(in srgb, var(--series-4) 15%, transparent);
-  color: var(--series-4);
-}
-
-.category-badge.core {
+.category-badge.shoulders,
+.category-badge.hamstrings-glutes {
   background: color-mix(in srgb, var(--series-3) 15%, transparent);
   color: var(--series-3);
 }
 
+.category-badge.biceps,
+.category-badge.calves {
+  background: color-mix(in srgb, var(--series-4) 15%, transparent);
+  color: var(--series-4);
+}
+
+.category-badge.core,
 .category-badge.other {
   background: color-mix(in srgb, var(--text-dim) 15%, transparent);
   color: var(--text-dim);
