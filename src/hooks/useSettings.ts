@@ -7,6 +7,7 @@ export interface Settings {
   theme: 'dark' | 'light'
   showBodyMap: boolean
   minimalist: boolean
+  showRestTimer: boolean
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -14,6 +15,7 @@ const DEFAULT_SETTINGS: Settings = {
   theme: 'dark',
   showBodyMap: true,
   minimalist: true,
+  showRestTimer: false,
 }
 
 export function useSettings() {

@@ -32,6 +32,7 @@ export default function App() {
   } = useSplits()
   const [logging, setLogging] = useState(false)
   const [page, setPage] = useState<Page>('workouts')
+  const [heroTucked, setHeroTucked] = useState(false)
 
   const index = PAGES.indexOf(page)
   const indexRef = useRef(index)
@@ -41,11 +42,29 @@ export default function App() {
 
   const viewportRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
+  const workoutsScrollRef = useRef<HTMLDivElement>(null)
   const gesture = useRef({ startX: 0, startY: 0, width: 0, decided: false, horizontal: false, active: false })
 
   useEffect(() => {
     document.body.classList.toggle('theme-light', settings.theme === 'light')
   }, [settings.theme])
+
+  // Tuck the New Workout bar while scrolling down the history, bring it back on scroll up.
+  useEffect(() => {
+    const el = workoutsScrollRef.current
+    if (!el) return
+    let lastY = el.scrollTop
+    function onScroll() {
+      const y = el!.scrollTop
+      const dy = y - lastY
+      lastY = y
+      if (y < 40) setHeroTucked(false)
+      else if (dy > 6) setHeroTucked(true)
+      else if (dy < -6) setHeroTucked(false)
+    }
+    el.addEventListener('scroll', onScroll, { passive: true })
+    return () => el.removeEventListener('scroll', onScroll)
+  }, [])
 
   // Touch carousel: the track follows the finger, both pages moving together.
   useEffect(() => {
@@ -126,32 +145,28 @@ export default function App() {
       onSave={workout => {
         addWorkout(workout)
         setLogging(false)
+        setHeroTucked(false)
       }}
-      onCancel={() => setLogging(false)}
+      onCancel={() => {
+        setLogging(false)
+        setHeroTucked(false)
+      }}
     />
   ) : (
-    <>
-      <div className="new-workout-hero">
-        <button className="btn-hero" onClick={() => setLogging(true)}>
-          + New Workout
-        </button>
-      </div>
-
-      <section className="history">
-        <h2>History</h2>
-        {workouts.length === 0 ? (
-          <div className="empty-state">
-            <p>No workouts yet — hit “New Workout” to log your first session.</p>
-          </div>
-        ) : (
-          <div className="workout-grid">
-            {workouts.map(w => (
-              <WorkoutCard key={w.id} workout={w} onDelete={deleteWorkout} />
-            ))}
-          </div>
-        )}
-      </section>
-    </>
+    <section className="history">
+      <h2>History</h2>
+      {workouts.length === 0 ? (
+        <div className="empty-state">
+          <p>No workouts yet — hit “New Workout” to log your first session.</p>
+        </div>
+      ) : (
+        <div className="workout-grid">
+          {workouts.map(w => (
+            <WorkoutCard key={w.id} workout={w} onDelete={deleteWorkout} />
+          ))}
+        </div>
+      )}
+    </section>
   )
 
   return (
@@ -169,7 +184,7 @@ export default function App() {
           ref={trackRef}
           style={{ transform: `translateX(-${index * 100}%)`, transition: PAGER_TRANSITION }}
         >
-          <div className="pager-page">{workoutsPage}</div>
+          <div className="pager-page" ref={workoutsScrollRef}>{workoutsPage}</div>
           <div className="pager-page">
             <Splits
               splits={allSplits}
@@ -190,6 +205,15 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      <button
+        className={`new-workout-bar${settings.showRestTimer ? '' : ' full'}${
+          page !== 'workouts' || logging || heroTucked ? ' tucked' : ''
+        }`}
+        onClick={() => setLogging(true)}
+      >
+        + New Workout
+      </button>
 
       <nav className="bottom-nav">
         <button
@@ -222,7 +246,7 @@ export default function App() {
         </button>
       </nav>
 
-      <RestTimerWidget />
+      {settings.showRestTimer && <RestTimerWidget />}
     </div>
   )
 }

@@ -88,6 +88,27 @@ export function SettingsMenu({ settings, onChange }: Props) {
 
             <div className="settings-row">
               <div className="settings-row-text">
+                <span className="settings-row-label">Rest timer</span>
+                <span className="settings-row-hint">Floating timer button for rests</span>
+              </div>
+              <div className="unit-toggle">
+                <button
+                  className={`unit-option${settings.showRestTimer ? ' active' : ''}`}
+                  onClick={() => onChange({ showRestTimer: true })}
+                >
+                  On
+                </button>
+                <button
+                  className={`unit-option${!settings.showRestTimer ? ' active' : ''}`}
+                  onClick={() => onChange({ showRestTimer: false })}
+                >
+                  Off
+                </button>
+              </div>
+            </div>
+
+            <div className="settings-row">
+              <div className="settings-row-text">
                 <span className="settings-row-label">Body map</span>
                 <span className="settings-row-hint">Clickable figure on the Exercises page</span>
               </div>
