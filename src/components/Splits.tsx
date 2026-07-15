@@ -1,20 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
-import type { Split, SplitDay } from '../types'
-import { DEFAULT_EXERCISES } from '../data/exercises'
+import type { Exercise, Split, SplitDay } from '../types'
 
 interface Props {
   splits: Split[]
   activeSplitId: string | null
   editedFeaturedIds: string[]
+  exercises: Exercise[]
   onSetActive: (id: string | null) => void
   onCreate: (split: Split) => void
   onUpdate: (split: Split) => void
   onReset: (id: string) => void
   onDelete: (id: string) => void
-}
-
-function exerciseName(id: string): string {
-  return DEFAULT_EXERCISES.find(e => e.id === id)?.name ?? id
 }
 
 interface DraftDay {
@@ -32,12 +28,14 @@ export function Splits({
   splits,
   activeSplitId,
   editedFeaturedIds,
+  exercises,
   onSetActive,
   onCreate,
   onUpdate,
   onReset,
   onDelete,
 }: Props) {
+  const exerciseName = (id: string) => exercises.find(e => e.id === id)?.name ?? id
   const [editor, setEditor] = useState<Editor>({ mode: 'closed' })
   const [draftName, setDraftName] = useState('')
   const [draftDays, setDraftDays] = useState<DraftDay[]>([])
@@ -248,7 +246,7 @@ export function Splits({
                     }}
                   >
                     <option value="">+ Add exercise…</option>
-                    {DEFAULT_EXERCISES.filter(ex => !day.exerciseIds.includes(ex.id)).map(ex => (
+                    {exercises.filter(ex => !day.exerciseIds.includes(ex.id)).map(ex => (
                       <option key={ex.id} value={ex.id}>{ex.name}</option>
                     ))}
                   </select>

@@ -216,8 +216,6 @@ button {
   left: 1rem;
   right: calc(76px + 2.5rem);
   bottom: calc(var(--nav-height) + 1rem);
-  max-width: 480px;
-  margin: 0 auto;
   --hero-grow: 1; /* 0 = compact, 1 = full; driven by scroll position */
   padding: calc(0.7rem + 1.1rem * var(--hero-grow)) 1rem;
   font-size: calc(1rem + 0.3rem * var(--hero-grow));
@@ -343,7 +341,7 @@ button {
 }
 
 .workout-card-header h3 {
-  font-size: 1.05rem;
+  font-size: 1.35rem;
 }
 
 .workout-date {
@@ -423,11 +421,6 @@ button {
 
 .log-head h2 {
   font-size: 1.2rem;
-}
-
-.log-sub {
-  font-size: 0.8rem;
-  color: var(--text-dim);
 }
 
 /* Step 1: day picker */
@@ -591,10 +584,59 @@ textarea:focus {
 
 .picker-search {
   flex: 1;
+  background-color: var(--bg);
+  border: 1px solid color-mix(in srgb, var(--text) 25%, transparent);
+  border-radius: 999px;
+  padding: 0.65rem 1rem 0.65rem 2.4rem;
+  font-size: 0.95rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239aa0ac' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0.9rem center;
+  background-size: 16px;
+}
+
+.picker-search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
 .exercise-picker .category-filters {
   margin-bottom: 0.9rem;
+}
+
+.picker-item.picker-add {
+  border: 1px dashed color-mix(in srgb, var(--text) 35%, transparent);
+  background: transparent;
+}
+
+.picker-item.picker-add:hover {
+  border-color: var(--accent);
+}
+
+.picker-create {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.picker-create input {
+  flex: 1;
+  min-width: 0;
+}
+
+.exercise-tile.add-tile {
+  border: 1px dashed color-mix(in srgb, var(--text) 35%, transparent);
+  background: transparent;
+  color: var(--text-dim);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  min-height: 3.4rem;
+}
+
+.exercise-tile.add-tile:hover {
+  border-color: var(--accent);
+  color: var(--text);
 }
 
 .picker-grid {
@@ -1324,6 +1366,11 @@ textarea:focus {
   color: var(--series-3);
 }
 
+.category-badge.other {
+  background: color-mix(in srgb, var(--text-dim) 15%, transparent);
+  color: var(--text-dim);
+}
+
 .muscle-tags {
   display: flex;
   gap: 0.35rem;
@@ -1615,7 +1662,9 @@ textarea:focus {
 }
 
 .copy-last-chip {
-  display: inline-flex;
+  display: flex;
+  width: fit-content;
+  margin-left: auto; /* hug the right side */
   align-items: center;
   gap: 0.4rem;
   background: transparent;
@@ -1634,8 +1683,8 @@ textarea:focus {
 
 .log-title-row {
   display: flex;
-  align-items: center;
-  gap: 0.3rem;
+  align-items: baseline;
+  gap: 0.5rem;
 }
 
 .log-date {
@@ -1645,7 +1694,14 @@ textarea:focus {
 
 .log-edit {
   color: var(--text-dim);
-  padding: 0.2rem 0.4rem;
+  padding: 0;
+  font-size: 0.8rem;
+}
+
+.log-edit:hover {
+  color: var(--text);
+  text-decoration: underline;
+  background: transparent;
 }
 
 .btn-ghost.dim {

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { Split, Workout, WorkoutExercise, WorkoutSet } from '../types'
-import { DEFAULT_EXERCISES } from '../data/exercises'
+import type { Exercise, Split, Workout, WorkoutExercise, WorkoutSet } from '../types'
 
 const DRAFT_KEY = 'lifting-tracker-workout-draft'
 
@@ -31,6 +30,8 @@ interface Props {
   activeSplit: Split | null
   workouts: Workout[]
   minimalist: boolean
+  exerciseCatalog: Exercise[]
+  onCreateExercise: (name: string) => Exercise
 }
 
 function newSet(unit: 'kg' | 'lbs'): WorkoutSet {
@@ -46,7 +47,16 @@ function newWorkoutExercise(exerciseId: string, exerciseName: string, unit: 'kg'
   }
 }
 
-export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workouts, minimalist }: Props) {
+export function LogWorkout({
+  onSave,
+  onCancel,
+  defaultUnit,
+  activeSplit,
+  workouts,
+  minimalist,
+  exerciseCatalog,
+  onCreateExercise,
+}: Props) {
   const today = new Date().toISOString().split('T')[0]
   const unit = defaultUnit
 
@@ -64,6 +74,7 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null)
   const [openSetId, setOpenSetId] = useState<string | null>(null)
+  const [creating, setCreating] = useState<string | null>(null)
 
   // Drag-to-reorder state
   const [draggingId, setDraggingId] = useState<string | null>(null)
@@ -92,7 +103,7 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
     if (!day) return
     setExercises(
       day.exerciseIds.flatMap(exId => {
-        const ex = DEFAULT_EXERCISES.find(e => e.id === exId)
+        const ex = exerciseCatalog.find(e => e.id === exId)
         return ex ? [newWorkoutExercise(ex.id, ex.name, unit)] : []
       })
     )
@@ -127,9 +138,20 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
   }
 
   function addExerciseById(id: string) {
-    const ex = DEFAULT_EXERCISES.find(e => e.id === id)
+    const ex = exerciseCatalog.find(e => e.id === id)
     if (!ex) return
     setExercises(prev => [...prev, newWorkoutExercise(ex.id, ex.name, unit)])
+  }
+
+  function confirmCreateExercise() {
+    const name = (creating ?? '').trim()
+    if (!name) return
+    const ex = onCreateExercise(name)
+    setExercises(prev =>
+      prev.some(e => e.exerciseId === ex.id) ? prev : [...prev, newWorkoutExercise(ex.id, ex.name, unit)]
+    )
+    setCreating(null)
+    setPickerSearch('')
   }
 
   function removeExercise(id: string) {
@@ -374,15 +396,14 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
   }
 
   // ---- Step 2: log the workout ----
-  const categories = ['all', ...Array.from(new Set(DEFAULT_EXERCISES.map(e => e.category)))]
+  const categories = ['all', ...Array.from(new Set(exerciseCatalog.map(e => e.category)))]
   const addedIds = new Set(exercises.map(e => e.exerciseId))
   const q = pickerSearch.trim().toLowerCase()
-  const pickerResults = DEFAULT_EXERCISES.filter(
+  const canCreate = q !== '' && !exerciseCatalog.some(ex => ex.name.trim().toLowerCase() === q)
+  const pickerResults = exerciseCatalog.filter(
     ex =>
       (pickerCategory === 'all' || ex.category === pickerCategory) &&
-      (q === '' ||
-        ex.name.toLowerCase().includes(q) ||
-        ex.muscleGroups.some(m => m.toLowerCase().includes(q)))
+      (q === '' || ex.name.toLowerCase().includes(q))
   )
   const shortDate = new Date(date + 'T00:00:00').toLocaleDateString(undefined, {
     month: 'short',
@@ -392,21 +413,18 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
   return (
     <div className="log-workout">
       <div className="log-head">
-        <div>
-          <div className="log-title-row">
-            <h2>
-              {splitDay ? `${splitDay} Day` : name.trim() || 'Workout'}
-              <span className="log-date"> · {shortDate}</span>
-            </h2>
-            <button
-              className="btn-ghost small log-edit"
-              onClick={() => setDetailsOpen(o => !o)}
-              aria-label="Edit name and date"
-            >
-              edit
-            </button>
-          </div>
-          {splitDay && activeSplit && <span className="log-sub">{activeSplit.name}</span>}
+        <div className="log-title-row">
+          <h2>
+            {splitDay ? `${splitDay} Day` : name.trim() || 'Workout'}
+            <span className="log-date"> · {shortDate}</span>
+          </h2>
+          <button
+            className="btn-ghost small log-edit"
+            onClick={() => setDetailsOpen(o => !o)}
+            aria-label="Edit name and date"
+          >
+            edit
+          </button>
         </div>
         <button className="btn-ghost" onClick={handleCancel}>Cancel</button>
       </div>
@@ -545,10 +563,35 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
             ))}
           </div>
 
-          {pickerResults.length === 0 ? (
+          {creating !== null && (
+            <div className="picker-create">
+              <input
+                value={creating}
+                onChange={e => setCreating(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') confirmCreateExercise()
+                  if (e.key === 'Escape') setCreating(null)
+                }}
+                placeholder="Exercise name"
+                autoFocus
+              />
+              <button className="btn-primary" onClick={confirmCreateExercise} disabled={!creating.trim()}>
+                Add
+              </button>
+              <button className="btn-ghost" onClick={() => setCreating(null)}>Cancel</button>
+            </div>
+          )}
+
+          {pickerResults.length === 0 && !canCreate ? (
             <p className="empty-hint">No exercises match.</p>
           ) : (
             <div className="picker-grid">
+              {canCreate && creating === null && (
+                <button className="picker-item picker-add" onClick={() => setCreating(pickerSearch.trim())}>
+                  <span className="picker-item-name">+ Add “{pickerSearch.trim()}”</span>
+                  <span className="picker-item-muscles">Create custom exercise</span>
+                </button>
+              )}
               {pickerResults.map(ex => {
                 const added = addedIds.has(ex.id)
                 return (

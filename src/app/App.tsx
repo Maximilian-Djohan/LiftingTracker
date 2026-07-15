@@ -9,6 +9,7 @@ import { Splits } from '../components/Splits'
 import { SettingsMenu } from '../components/SettingsMenu'
 import { RestTimerWidget } from '../components/RestTimerWidget'
 import { useSplits } from '../hooks/useSplits'
+import { useCustomExercises } from '../hooks/useCustomExercises'
 import './styles.css'
 
 type Page = 'workouts' | 'splits' | 'exercises' | 'nutrition'
@@ -30,6 +31,7 @@ export default function App() {
     resetSplit,
     deleteCustomSplit,
   } = useSplits()
+  const { allExercises, addCustomExercise, removeCustomExercise } = useCustomExercises()
   const [logging, setLogging] = useState(false)
   const [page, setPage] = useState<Page>('workouts')
 
@@ -155,6 +157,8 @@ export default function App() {
       activeSplit={activeSplit}
       workouts={workouts}
       minimalist={settings.minimalist}
+      exerciseCatalog={allExercises}
+      onCreateExercise={addCustomExercise}
       onSave={workout => {
         addWorkout(workout)
         setLogging(false)
@@ -199,6 +203,7 @@ export default function App() {
               splits={allSplits}
               activeSplitId={activeSplitId}
               editedFeaturedIds={editedFeaturedIds}
+              exercises={allExercises}
               onSetActive={setActiveSplitId}
               onCreate={addCustomSplit}
               onUpdate={updateSplit}
@@ -207,7 +212,13 @@ export default function App() {
             />
           </div>
           <div className="pager-page">
-            <Exercises showBodyMap={settings.showBodyMap} minimalist={settings.minimalist} />
+            <Exercises
+              showBodyMap={settings.showBodyMap}
+              minimalist={settings.minimalist}
+              exercises={allExercises}
+              onRemoveCustom={removeCustomExercise}
+              onCreate={addCustomExercise}
+            />
           </div>
           <div className="pager-page">
             <Nutrition />

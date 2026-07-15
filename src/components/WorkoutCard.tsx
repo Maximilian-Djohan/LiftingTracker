@@ -19,7 +19,9 @@ export function WorkoutCard({ workout, onDelete }: Props) {
         <div>
           <div className="workout-title-row">
             <h3>{workout.name}</h3>
-            {workout.splitDay && <span className="split-badge">{workout.splitDay}</span>}
+            {workout.splitDay && workout.splitDay.trim().toLowerCase() !== workout.name.trim().toLowerCase() && (
+              <span className="split-badge">{workout.splitDay}</span>
+            )}
           </div>
           <span className="workout-date">{formatDate(workout.date)}</span>
         </div>
