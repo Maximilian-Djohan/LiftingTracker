@@ -96,17 +96,7 @@ export function Exercises({ showBodyMap, minimalist, exercises, onRemoveCustom, 
         </div>
       )}
 
-      {filtered.length === 0 && creating === null ? (
-        <>
-          <p className="empty-hint">No exercises match your filters.</p>
-          <div className="exercise-grid">
-            <button className="exercise-tile add-tile" onClick={() => setCreating(search.trim())}>
-              + Add {search.trim() ? `“${search.trim()}”` : 'exercise'}
-            </button>
-          </div>
-        </>
-      ) : (
-        <div className="exercise-grid">
+      <div className="exercise-grid">
           {creating === null && (
             <button className="exercise-tile add-tile" onClick={() => setCreating(search.trim())}>
               + Add {search.trim() && !filtered.some(ex => ex.name.trim().toLowerCase() === search.trim().toLowerCase())
@@ -140,7 +130,10 @@ export function Exercises({ showBodyMap, minimalist, exercises, onRemoveCustom, 
               )}
             </div>
           ))}
-        </div>
+      </div>
+
+      {filtered.length === 0 && (
+        <p className="empty-hint">No exercises match your filters.</p>
       )}
     </div>
   )

@@ -142,7 +142,10 @@ export function Splits({
           <div className="split-card active-split">
             <div className="split-card-head">
               <h3>{activeSplit.name}</h3>
-              <button className="btn-ghost small" onClick={() => onSetActive(null)}>Unset</button>
+              <div className="split-card-actions">
+                <button className="btn-ghost small" onClick={() => openEdit(activeSplit)}>✎ Edit</button>
+                <button className="btn-ghost small" onClick={() => onSetActive(null)}>Unset</button>
+              </div>
             </div>
             <div className="split-days">
               {activeSplit.days.map(day => (

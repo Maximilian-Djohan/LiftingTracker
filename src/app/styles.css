@@ -625,6 +625,7 @@ textarea:focus {
 }
 
 .exercise-tile.add-tile {
+  grid-column: 1 / -1; /* span the full grid row (2 blocks) */
   border: 1px dashed color-mix(in srgb, var(--text) 35%, transparent);
   background: transparent;
   color: var(--text-dim);
