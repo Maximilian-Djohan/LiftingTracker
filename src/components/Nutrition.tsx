@@ -5,10 +5,10 @@ import { useNutrition } from '../hooks/useNutrition'
 import { DonutChart } from './DonutChart'
 
 const COLORS = {
-  calories: '#f5a623',
-  protein: '#5b9dff',
-  carbs: '#6ed08a',
-  fats: '#e26fb0',
+  calories: 'var(--series-4)',
+  protein: 'var(--series-1)',
+  carbs: 'var(--series-2)',
+  fats: 'var(--series-3)',
 }
 
 function todayISO() {

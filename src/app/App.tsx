@@ -32,7 +32,7 @@ export default function App() {
   } = useSplits()
   const [logging, setLogging] = useState(false)
   const [page, setPage] = useState<Page>('workouts')
-  const [heroTucked, setHeroTucked] = useState(false)
+  const [heroShrunk, setHeroShrunk] = useState(false)
 
   const index = PAGES.indexOf(page)
   const indexRef = useRef(index)
@@ -49,7 +49,7 @@ export default function App() {
     document.body.classList.toggle('theme-light', settings.theme === 'light')
   }, [settings.theme])
 
-  // Tuck the New Workout bar while scrolling down the history, bring it back on scroll up.
+  // Shrink the New Workout bar while scrolling down the history, grow it back on scroll up.
   useEffect(() => {
     const el = workoutsScrollRef.current
     if (!el) return
@@ -58,9 +58,9 @@ export default function App() {
       const y = el!.scrollTop
       const dy = y - lastY
       lastY = y
-      if (y < 40) setHeroTucked(false)
-      else if (dy > 6) setHeroTucked(true)
-      else if (dy < -6) setHeroTucked(false)
+      if (y < 40) setHeroShrunk(false)
+      else if (dy > 6) setHeroShrunk(true)
+      else if (dy < -6) setHeroShrunk(false)
     }
     el.addEventListener('scroll', onScroll, { passive: true })
     return () => el.removeEventListener('scroll', onScroll)
@@ -145,11 +145,11 @@ export default function App() {
       onSave={workout => {
         addWorkout(workout)
         setLogging(false)
-        setHeroTucked(false)
+        setHeroShrunk(false)
       }}
       onCancel={() => {
         setLogging(false)
-        setHeroTucked(false)
+        setHeroShrunk(false)
       }}
     />
   ) : (
@@ -208,8 +208,8 @@ export default function App() {
 
       <button
         className={`new-workout-bar${settings.showRestTimer ? '' : ' full'}${
-          page !== 'workouts' || logging || heroTucked ? ' tucked' : ''
-        }`}
+          heroShrunk ? ' shrunk' : ''
+        }${page !== 'workouts' || logging ? ' tucked' : ''}`}
         onClick={() => setLogging(true)}
       >
         + New Workout
