@@ -50,18 +50,33 @@ export default function App() {
   }, [settings.theme])
 
   // The New Workout bar grows gradually as the history approaches the top:
-  // full size at scrollTop 0, compact from 120px down.
+  // full size at scrollTop 0, compact from 160px down. The size eases toward
+  // the scroll target each frame so it stays fluid between scroll events.
   useEffect(() => {
     const el = workoutsScrollRef.current
     if (!el) return
-    const GROW_RANGE = 120
-    const update = () => {
-      const p = Math.max(0, Math.min(1, 1 - el.scrollTop / GROW_RANGE))
-      heroBarRef.current?.style.setProperty('--hero-grow', String(p))
+    const GROW_RANGE = 160
+    const targetFor = () => Math.max(0, Math.min(1, 1 - el.scrollTop / GROW_RANGE))
+    let current = targetFor()
+    let target = current
+    let raf = 0
+    const apply = () => heroBarRef.current?.style.setProperty('--hero-grow', current.toFixed(3))
+    const step = () => {
+      current += (target - current) * 0.15
+      if (Math.abs(target - current) < 0.002) current = target
+      apply()
+      raf = current === target ? 0 : requestAnimationFrame(step)
     }
-    update()
-    el.addEventListener('scroll', update, { passive: true })
-    return () => el.removeEventListener('scroll', update)
+    const onScroll = () => {
+      target = targetFor()
+      if (!raf) raf = requestAnimationFrame(step)
+    }
+    apply()
+    el.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      el.removeEventListener('scroll', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
   }, [])
 
   // Touch carousel: the track follows the finger, both pages moving together.
