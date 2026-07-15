@@ -58,10 +58,6 @@ body.theme-light .bottom-nav {
   background: rgba(255, 255, 255, 0.92);
 }
 
-body.theme-light .stat-value {
-  color: var(--text);
-}
-
 body.theme-light .body-poly {
   fill: #ccd3de;
   stroke: rgba(60, 80, 120, 0.5);
@@ -197,35 +193,6 @@ button {
 .btn-ghost.small {
   padding: 0.2rem 0.45rem;
   font-size: 0.85rem;
-}
-
-/* Stats */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.6rem;
-  margin-bottom: 1.5rem;
-}
-
-.stat-tile {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.6rem 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.stat-value {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.stat-label {
-  font-size: 0.72rem;
-  color: var(--text-dim);
 }
 
 /* Big centered New Workout button */
@@ -1621,9 +1588,6 @@ tr.set-done input {
 }
 
 @media (max-width: 600px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .donut-grid {
     grid-template-columns: repeat(2, 1fr);
   }

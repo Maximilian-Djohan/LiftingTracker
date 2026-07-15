@@ -3,7 +3,6 @@ import { useWorkouts } from '../hooks/useWorkouts'
 import { useSettings } from '../hooks/useSettings'
 import { LogWorkout } from '../components/LogWorkout'
 import { WorkoutCard } from '../components/WorkoutCard'
-import { Stats } from '../components/Stats'
 import { Nutrition } from '../components/Nutrition'
 import { Exercises } from '../components/Exercises'
 import { Splits } from '../components/Splits'
@@ -132,8 +131,6 @@ export default function App() {
     />
   ) : (
     <>
-      <Stats workouts={workouts} />
-
       <div className="new-workout-hero">
         <button className="btn-hero" onClick={() => setLogging(true)}>
           + New Workout
