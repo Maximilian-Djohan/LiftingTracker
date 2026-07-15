@@ -61,12 +61,12 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
   const [pickerOpen, setPickerOpen] = useState(false)
   const [pickerSearch, setPickerSearch] = useState('')
   const [pickerCategory, setPickerCategory] = useState<string>('all')
+  const [detailsOpen, setDetailsOpen] = useState(false)
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null)
+  const [openSetId, setOpenSetId] = useState<string | null>(null)
 
   // Drag-to-reorder state
   const [draggingId, setDraggingId] = useState<string | null>(null)
-  const draggingIdRef = useRef<string | null>(null)
-  const exercisesRef = useRef(exercises)
-  exercisesRef.current = exercises
   const cardRefs = useRef(new Map<string, HTMLDivElement>())
 
   // Continuously persist the in-progress workout so leaving the site never loses it
@@ -164,16 +164,6 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
     )
   }
 
-  function toggleSetDone(exerciseId: string, setId: string) {
-    setExercises(prev =>
-      prev.map(e =>
-        e.id === exerciseId
-          ? { ...e, sets: e.sets.map(s => (s.id === setId ? { ...s, done: !s.done } : s)) }
-          : e
-      )
-    )
-  }
-
   function moveExercise(id: string, toIndex: number) {
     setExercises(prev => {
       const from = prev.findIndex(e => e.id === id)
@@ -185,34 +175,147 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
     })
   }
 
-  function startDrag(e: React.PointerEvent, id: string) {
-    e.preventDefault()
-    draggingIdRef.current = id
-    setDraggingId(id)
+  // Swipe a set row left to reveal its delete button
+  const DELETE_W = 76
+  const swipeRef = useRef<{
+    id: string
+    startX: number
+    startY: number
+    base: number
+    el: HTMLElement
+    decided: boolean
+    horizontal: boolean
+  } | null>(null)
 
-    const move = (ev: PointerEvent) => {
-      if (!draggingIdRef.current) return
-      const ordered = exercisesRef.current
-      let target = ordered.length - 1
-      for (let i = 0; i < ordered.length; i++) {
-        const el = cardRefs.current.get(ordered[i].id)
-        if (!el) continue
-        const rect = el.getBoundingClientRect()
-        if (ev.clientY < rect.top + rect.height / 2) {
-          target = i
-          break
-        }
-      }
-      moveExercise(draggingIdRef.current, target)
+  function startSetSwipe(e: React.PointerEvent<HTMLDivElement>, setId: string, canSwipe: boolean) {
+    if (openSetId && openSetId !== setId) setOpenSetId(null)
+    if (!canSwipe) return
+    const el = e.currentTarget
+    swipeRef.current = {
+      id: setId,
+      startX: e.clientX,
+      startY: e.clientY,
+      base: openSetId === setId ? -DELETE_W : 0,
+      el,
+      decided: false,
+      horizontal: false,
     }
-    const up = () => {
-      draggingIdRef.current = null
-      setDraggingId(null)
+
+    const cleanup = () => {
+      swipeRef.current = null
       window.removeEventListener('pointermove', move)
       window.removeEventListener('pointerup', up)
+      window.removeEventListener('pointercancel', up)
+    }
+    const move = (ev: PointerEvent) => {
+      const s = swipeRef.current
+      if (!s) return
+      const dx = ev.clientX - s.startX
+      const dy = ev.clientY - s.startY
+      if (!s.decided) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return
+        s.decided = true
+        s.horizontal = Math.abs(dx) > Math.abs(dy)
+        if (!s.horizontal) {
+          cleanup()
+          return
+        }
+        s.el.parentElement?.classList.add('swipe-active')
+      }
+      const x = Math.min(0, Math.max(-DELETE_W, s.base + dx))
+      s.el.style.transition = 'none'
+      s.el.style.transform = `translateX(${x}px)`
+    }
+    const up = (ev: PointerEvent) => {
+      const s = swipeRef.current
+      if (!s) return
+      s.el.style.transition = ''
+      s.el.style.transform = ''
+      s.el.parentElement?.classList.remove('swipe-active')
+      if (s.decided && s.horizontal) {
+        const x = s.base + (ev.clientX - s.startX)
+        setOpenSetId(x < -DELETE_W / 2 ? s.id : null)
+        // a swipe is not a tap: drop focus and swallow the trailing click
+        if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+        window.addEventListener(
+          'click',
+          e => {
+            e.stopPropagation()
+            e.preventDefault()
+          },
+          { capture: true, once: true }
+        )
+      } else if (!s.decided && openSetId === s.id) {
+        setOpenSetId(null) // plain tap on an open row closes it
+      }
+      cleanup()
     }
     window.addEventListener('pointermove', move)
     window.addEventListener('pointerup', up)
+    window.addEventListener('pointercancel', up)
+  }
+
+  // Hold the grip: the card lifts and follows the pointer while the other
+  // cards slide out of the way; the new order commits on release.
+  function startDrag(e: React.PointerEvent, id: string) {
+    e.preventDefault()
+    const from = exercises.findIndex(x => x.id === id)
+    if (from === -1) return
+    const els = exercises.map(x => cardRefs.current.get(x.id))
+    if (els.some(el => !el)) return
+    const cards = els as HTMLDivElement[]
+    const rects = cards.map(el => el.getBoundingClientRect())
+    const gap = rects.length > 1 ? Math.max(0, rects[1].top - rects[0].bottom) : 16
+    const lift = rects[from].height + gap
+    const startY = e.clientY
+    let target = from
+
+    setDraggingId(id)
+
+    const move = (ev: PointerEvent) => {
+      const dy = ev.clientY - startY
+      const center = rects[from].top + rects[from].height / 2 + dy
+
+      target = from
+      for (let k = 0; k < rects.length; k++) {
+        if (k === from) continue
+        const mid = rects[k].top + rects[k].height / 2
+        if (k < from && center < mid) target = Math.min(target, k)
+        if (k > from && center > mid) target = Math.max(target, k)
+      }
+
+      cards.forEach((el, k) => {
+        if (k === from) {
+          el.style.transition = 'none'
+          el.style.transform = `translateY(${dy}px) scale(1.02)`
+          return
+        }
+        let shift = 0
+        if (from < k && k <= target) shift = -lift
+        else if (target <= k && k < from) shift = lift
+        el.style.transition = 'transform 0.18s ease'
+        el.style.transform = shift ? `translateY(${shift}px)` : ''
+      })
+    }
+    const up = () => {
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+      window.removeEventListener('pointercancel', up)
+      cards.forEach(el => {
+        el.style.transition = 'none'
+        el.style.transform = ''
+      })
+      setDraggingId(null)
+      moveExercise(id, target)
+      requestAnimationFrame(() => {
+        cards.forEach(el => {
+          el.style.transition = ''
+        })
+      })
+    }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+    window.addEventListener('pointercancel', up)
   }
 
   function handleSave() {
@@ -281,49 +384,50 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
         ex.name.toLowerCase().includes(q) ||
         ex.muscleGroups.some(m => m.toLowerCase().includes(q)))
   )
-  const doneSets = exercises.reduce((s, e) => s + e.sets.filter(x => x.done).length, 0)
-  const totalSets = exercises.reduce((s, e) => s + e.sets.length, 0)
+  const shortDate = new Date(date + 'T00:00:00').toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+  })
 
   return (
     <div className="log-workout">
       <div className="log-head">
         <div>
-          <h2>{splitDay ? `${splitDay} Day` : 'Workout'}</h2>
+          <div className="log-title-row">
+            <h2>
+              {splitDay ? `${splitDay} Day` : name.trim() || 'Workout'}
+              <span className="log-date"> · {shortDate}</span>
+            </h2>
+            <button
+              className="btn-ghost small log-edit"
+              onClick={() => setDetailsOpen(o => !o)}
+              aria-label="Edit name and date"
+            >
+              edit
+            </button>
+          </div>
           {splitDay && activeSplit && <span className="log-sub">{activeSplit.name}</span>}
         </div>
         <button className="btn-ghost" onClick={handleCancel}>Cancel</button>
       </div>
 
-      {lastSameDay && (
-        <div className="copy-last-bar">
-          <span>
-            Last <strong>{splitDay}</strong> was {lastSameDay.date}
-          </span>
-          <button className="btn-secondary" onClick={copyFromLast}>Copy last {splitDay}</button>
+      {detailsOpen && (
+        <div className="form-row">
+          <label>
+            Name
+            <input value={name} onChange={e => setName(e.target.value)} placeholder={`Workout – ${date}`} />
+          </label>
+          <label>
+            Date
+            <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+          </label>
         </div>
       )}
 
-      <div className="form-row">
-        <label>
-          Name
-          <input value={name} onChange={e => setName(e.target.value)} placeholder={`Workout – ${date}`} />
-        </label>
-        <label>
-          Date
-          <input type="date" value={date} onChange={e => setDate(e.target.value)} />
-        </label>
-      </div>
-
-      {totalSets > 0 && (
-        <div className="set-progress">
-          <div className="set-progress-track">
-            <div
-              className="set-progress-fill"
-              style={{ width: `${totalSets ? (doneSets / totalSets) * 100 : 0}%` }}
-            />
-          </div>
-          <span className="set-progress-label">{doneSets} / {totalSets} sets done</span>
-        </div>
+      {lastSameDay && (
+        <button className="copy-last-chip" onClick={copyFromLast}>
+          ↺ Copy last {splitDay} · {lastSameDay.date}
+        </button>
       )}
 
       <div className="exercises-list">
@@ -346,24 +450,35 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
                 ⠿
               </span>
               <h3>{ex.exerciseName}</h3>
-              <button className="btn-ghost danger small" onClick={() => removeExercise(ex.id)}>Remove</button>
+              <button
+                className={`btn-ghost small${confirmRemove === ex.id ? ' danger' : ' dim'}`}
+                onClick={() => {
+                  if (confirmRemove === ex.id) {
+                    removeExercise(ex.id)
+                    setConfirmRemove(null)
+                  } else {
+                    setConfirmRemove(ex.id)
+                  }
+                }}
+                onBlur={() => setConfirmRemove(null)}
+                aria-label="Remove exercise"
+              >
+                {confirmRemove === ex.id ? 'Remove?' : '✕'}
+              </button>
             </div>
 
-            <table className="sets-table">
-              <thead>
-                <tr>
-                  <th>Set</th>
-                  <th>Weight ({unit})</th>
-                  <th>Reps</th>
-                  <th>Done</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {ex.sets.map((set, si) => (
-                  <tr key={set.id} className={set.done ? 'set-done' : ''}>
-                    <td className="set-num">{si + 1}</td>
-                    <td>
+            <div className="set-rows">
+              {ex.sets.map((set, si) => (
+                <div key={set.id} className={`set-row-swipe${openSetId === set.id ? ' open' : ''}`}>
+                  <div
+                    className="set-row"
+                    style={{
+                      transform: openSetId === set.id ? `translateX(-${DELETE_W}px)` : undefined,
+                    }}
+                    onPointerDown={e => startSetSwipe(e, set.id, ex.sets.length > 1)}
+                  >
+                    <span className="set-num">{si + 1}</span>
+                    <label className="set-field">
                       <input
                         type="number"
                         min="0"
@@ -371,8 +486,9 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
                         onChange={e => updateSet(ex.id, set.id, 'weight', parseFloat(e.target.value) || 0)}
                         placeholder="0"
                       />
-                    </td>
-                    <td>
+                      <span className="set-suffix">{unit}</span>
+                    </label>
+                    <label className="set-field">
                       <input
                         type="number"
                         min="0"
@@ -381,26 +497,26 @@ export function LogWorkout({ onSave, onCancel, defaultUnit, activeSplit, workout
                         onChange={e => updateSet(ex.id, set.id, 'reps', parseFloat(e.target.value) || 0)}
                         placeholder="0"
                       />
-                    </td>
-                    <td>
-                      <button
-                        className={`set-check${set.done ? ' checked' : ''}`}
-                        onClick={() => toggleSetDone(ex.id, set.id)}
-                        aria-label={set.done ? 'Mark set not done' : 'Mark set done'}
-                      >
-                        ✓
-                      </button>
-                    </td>
-                    <td>
-                      {ex.sets.length > 1 && (
-                        <button className="btn-ghost danger small" onClick={() => removeSet(ex.id, set.id)}>✕</button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <button className="btn-ghost" onClick={() => addSet(ex.id)}>+ Add Set</button>
+                      <span className="set-suffix">reps</span>
+                    </label>
+                  </div>
+                  <button
+                    className="set-delete"
+                    tabIndex={openSetId === set.id ? 0 : -1}
+                    onClick={() => {
+                      removeSet(ex.id, set.id)
+                      setOpenSetId(null)
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="set-actions">
+              <button className="btn-ghost small" onClick={() => addSet(ex.id)}>+ set</button>
+            </div>
           </div>
         ))}
       </div>
