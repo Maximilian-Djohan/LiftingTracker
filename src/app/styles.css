@@ -218,17 +218,15 @@ button {
   bottom: calc(var(--nav-height) + 1rem);
   max-width: 480px;
   margin: 0 auto;
-  padding: 1.8rem 1rem;
-  font-size: 1.3rem;
+  --hero-grow: 1; /* 0 = compact, 1 = full; driven by scroll position */
+  padding: calc(0.7rem + 1.1rem * var(--hero-grow)) 1rem;
+  font-size: calc(1rem + 0.3rem * var(--hero-grow));
   font-weight: 700;
   color: var(--on-accent);
   background: var(--accent);
   border: none;
   border-radius: 18px;
-  transition:
-    transform 0.32s cubic-bezier(0.22, 0.61, 0.36, 1),
-    padding 0.25s ease,
-    font-size 0.25s ease;
+  transition: transform 0.32s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .new-workout-bar.full {
@@ -237,11 +235,6 @@ button {
 
 .new-workout-bar:hover {
   background: var(--accent-hover);
-}
-
-.new-workout-bar.shrunk {
-  padding: 0.7rem 1rem;
-  font-size: 1rem;
 }
 
 .new-workout-bar.tucked {

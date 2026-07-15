@@ -32,7 +32,6 @@ export default function App() {
   } = useSplits()
   const [logging, setLogging] = useState(false)
   const [page, setPage] = useState<Page>('workouts')
-  const [heroShrunk, setHeroShrunk] = useState(false)
 
   const index = PAGES.indexOf(page)
   const indexRef = useRef(index)
@@ -43,27 +42,26 @@ export default function App() {
   const viewportRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const workoutsScrollRef = useRef<HTMLDivElement>(null)
+  const heroBarRef = useRef<HTMLButtonElement>(null)
   const gesture = useRef({ startX: 0, startY: 0, width: 0, decided: false, horizontal: false, active: false })
 
   useEffect(() => {
     document.body.classList.toggle('theme-light', settings.theme === 'light')
   }, [settings.theme])
 
-  // Shrink the New Workout bar while scrolling down the history, grow it back on scroll up.
+  // The New Workout bar grows gradually as the history approaches the top:
+  // full size at scrollTop 0, compact from 120px down.
   useEffect(() => {
     const el = workoutsScrollRef.current
     if (!el) return
-    let lastY = el.scrollTop
-    function onScroll() {
-      const y = el!.scrollTop
-      const dy = y - lastY
-      lastY = y
-      if (y < 40) setHeroShrunk(false)
-      else if (dy > 6) setHeroShrunk(true)
-      else if (dy < -6) setHeroShrunk(false)
+    const GROW_RANGE = 120
+    const update = () => {
+      const p = Math.max(0, Math.min(1, 1 - el.scrollTop / GROW_RANGE))
+      heroBarRef.current?.style.setProperty('--hero-grow', String(p))
     }
-    el.addEventListener('scroll', onScroll, { passive: true })
-    return () => el.removeEventListener('scroll', onScroll)
+    update()
+    el.addEventListener('scroll', update, { passive: true })
+    return () => el.removeEventListener('scroll', update)
   }, [])
 
   // Touch carousel: the track follows the finger, both pages moving together.
@@ -145,12 +143,8 @@ export default function App() {
       onSave={workout => {
         addWorkout(workout)
         setLogging(false)
-        setHeroShrunk(false)
       }}
-      onCancel={() => {
-        setLogging(false)
-        setHeroShrunk(false)
-      }}
+      onCancel={() => setLogging(false)}
     />
   ) : (
     <section className="history">
@@ -207,9 +201,10 @@ export default function App() {
       </div>
 
       <button
+        ref={heroBarRef}
         className={`new-workout-bar${settings.showRestTimer ? '' : ' full'}${
-          heroShrunk ? ' shrunk' : ''
-        }${page !== 'workouts' || logging ? ' tucked' : ''}`}
+          page !== 'workouts' || logging ? ' tucked' : ''
+        }`}
         onClick={() => setLogging(true)}
       >
         + New Workout
