@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import type { Exercise } from '../types'
 import { CATEGORY_LABELS } from '../data/exercises'
+import { EXERCISE_DETAILS, similarExercises } from '../data/exerciseDetails'
 import { REGION_MATCHERS } from '../data/bodyMap'
 import { BodyMap } from './BodyMap'
+import { ExerciseThumb } from './ExerciseThumb'
 
 const CATEGORIES = [
   'all',
@@ -33,6 +35,7 @@ export function Exercises({ showBodyMap, minimalist, exercises, onRemoveCustom, 
   const [category, setCategory] = useState<Category>('all')
   const [region, setRegion] = useState<string | null>(null)
   const [creating, setCreating] = useState<string | null>(null)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
 
   function confirmCreate() {
     const name = (creating ?? '').trim()
@@ -116,32 +119,87 @@ export function Exercises({ showBodyMap, minimalist, exercises, onRemoveCustom, 
                 : 'exercise'}
             </button>
           )}
-          {filtered.map(ex => (
-            <div key={ex.id} className="exercise-tile">
-              <div className="exercise-tile-head">
-                <h3>{ex.name}</h3>
-                <span className={`category-badge ${ex.category}`}>
-                  {isCustom(ex) ? 'custom' : CATEGORY_LABELS[ex.category]}
-                </span>
-                {isCustom(ex) && (
-                  <button
-                    className="btn-ghost small dim"
-                    onClick={() => onRemoveCustom(ex.id)}
-                    aria-label={`Remove ${ex.name}`}
-                  >
-                    ✕
-                  </button>
+          {filtered.map(ex => {
+            const expanded = expandedId === ex.id
+            const details = EXERCISE_DETAILS[ex.id]
+            const alternatives = expanded ? similarExercises(ex, exercises) : []
+            return (
+              <div
+                key={ex.id}
+                className={`exercise-tile${expanded ? ' expanded' : ''}`}
+                onClick={() => setExpandedId(expanded ? null : ex.id)}
+              >
+                <div className="exercise-tile-head">
+                  <h3>{ex.name}</h3>
+                  <span className={`category-badge ${ex.category}`}>
+                    {isCustom(ex) ? 'custom' : CATEGORY_LABELS[ex.category]}
+                  </span>
+                  {isCustom(ex) && (
+                    <button
+                      className="btn-ghost small dim"
+                      onClick={e => {
+                        e.stopPropagation()
+                        onRemoveCustom(ex.id)
+                      }}
+                      aria-label={`Remove ${ex.name}`}
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+                <ExerciseThumb exercise={ex} />
+                {!minimalist && (
+                  <div className="muscle-tags">
+                    {ex.muscleGroups.map(m => (
+                      <span key={m} className="muscle-tag">{m}</span>
+                    ))}
+                  </div>
+                )}
+                {expanded && (
+                  <div className="exercise-detail" onClick={e => e.stopPropagation()}>
+                    {details ? (
+                      <>
+                        <p className="detail-desc">{details.description}</p>
+                        <h4>How to do it</h4>
+                        <ol className="detail-steps">
+                          {details.instructions.map((step, i) => (
+                            <li key={i}>{step}</li>
+                          ))}
+                        </ol>
+                        <h4>Tips</h4>
+                        <ul className="detail-tips">
+                          {details.tips.map((tip, i) => (
+                            <li key={i}>{tip}</li>
+                          ))}
+                        </ul>
+                      </>
+                    ) : (
+                      <p className="detail-desc">No guide yet for this custom exercise.</p>
+                    )}
+                    {alternatives.length > 0 && (
+                      <>
+                        <h4>Alternatives</h4>
+                        <div className="alt-chips">
+                          {alternatives.map(alt => (
+                            <button
+                              key={alt.id}
+                              className="preset-chip"
+                              onClick={() => {
+                                setSearch(alt.name)
+                                setExpandedId(alt.id)
+                              }}
+                            >
+                              {alt.name}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 )}
               </div>
-              {!minimalist && (
-                <div className="muscle-tags">
-                  {ex.muscleGroups.map(m => (
-                    <span key={m} className="muscle-tag">{m}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+            )
+          })}
       </div>
 
       {filtered.length === 0 && (

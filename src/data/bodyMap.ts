@@ -28,6 +28,43 @@ export const MUSCLE_TO_REGION: Record<string, string> = {
   calves: 'Calves',
 }
 
+/** Ordered most-specific-first: first term contained in a muscle-group string wins */
+const TERM_TO_MUSCLES: [string, string[]][] = [
+  ['front delts', ['front-deltoids']],
+  ['rear delts', ['back-deltoids']],
+  ['side delts', ['front-deltoids', 'back-deltoids']],
+  ['shoulders', ['front-deltoids', 'back-deltoids']],
+  ['upper back', ['trapezius', 'upper-back']],
+  ['lower back', ['lower-back']],
+  ['traps', ['trapezius']],
+  ['forearms', ['forearm']],
+  ['biceps', ['biceps']],
+  ['triceps', ['triceps']],
+  ['chest', ['chest']],
+  ['obliques', ['obliques']],
+  ['core', ['abs', 'obliques']],
+  ['quads', ['quadriceps']],
+  ['hamstrings', ['hamstring']],
+  ['glutes', ['gluteal']],
+  ['calves', ['calves']],
+  ['back', ['trapezius', 'upper-back', 'lower-back']],
+]
+
+/** Which body-map polygon muscles to light up for an exercise's muscleGroups */
+export function musclesForGroups(groups: string[]): Set<string> {
+  const out = new Set<string>()
+  for (const g of groups) {
+    const lower = g.toLowerCase()
+    for (const [term, muscles] of TERM_TO_MUSCLES) {
+      if (lower.includes(term)) {
+        muscles.forEach(m => out.add(m))
+        break
+      }
+    }
+  }
+  return out
+}
+
 /** Region -> substrings matched against each exercise's muscleGroups */
 export const REGION_MATCHERS: Record<string, string[]> = {
   Chest: ['chest'],

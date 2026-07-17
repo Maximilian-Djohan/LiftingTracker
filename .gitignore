@@ -3,5 +3,7 @@ dist
 dist-ssr
 *.local
 .DS_Store
+TODO.md
 .vscode/*
 !.vscode/extensions.json
+image-refs

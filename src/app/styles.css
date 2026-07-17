@@ -640,6 +640,100 @@ textarea:focus {
   color: var(--text);
 }
 
+/* Expandable exercise details */
+.exercise-tile {
+  cursor: pointer;
+}
+
+.exercise-tile.expanded {
+  grid-column: 1 / -1;
+}
+
+.exercise-detail {
+  cursor: auto;
+  margin-top: 0.7rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.7rem;
+  text-align: left;
+}
+
+.exercise-detail h4 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+  margin: 0.8rem 0 0.3rem;
+}
+
+.detail-desc {
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.detail-steps,
+.detail-tips {
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.detail-tips li::marker {
+  color: var(--text-dim);
+}
+
+.alt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* Exercise thumbnails: generated renders or body-map fallback */
+.exercise-thumb {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  min-height: 96px;
+}
+
+.exercise-thumb img {
+  max-height: 120px;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  background: white;
+}
+
+.thumb-figure {
+  height: 96px;
+}
+
+.thumb-poly {
+  fill: #232833;
+  stroke: rgba(150, 180, 235, 0.28);
+  stroke-width: 0.6;
+}
+
+.thumb-poly.lit {
+  fill: var(--text);
+  stroke: var(--text);
+  stroke-width: 0.8;
+}
+
+body.theme-light .thumb-poly {
+  fill: #ccd3de;
+  stroke: rgba(60, 80, 120, 0.4);
+}
+
+body.theme-light .thumb-poly.lit {
+  fill: #1c2028;
+  stroke: #1c2028;
+}
+
 .picker-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));

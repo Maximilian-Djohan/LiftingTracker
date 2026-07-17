@@ -42,6 +42,12 @@ export interface Workout {
   splitDay?: string
 }
 
+export interface ExerciseDetails {
+  description: string
+  instructions: string[]
+  tips: string[]
+}
+
 export interface SplitDay {
   id: string
   name: string
