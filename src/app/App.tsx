@@ -8,6 +8,7 @@ import { Exercises } from '../components/Exercises'
 import { Splits } from '../components/Splits'
 import { SettingsMenu } from '../components/SettingsMenu'
 import { RestTimerWidget } from '../components/RestTimerWidget'
+import { CoachChat } from '../components/CoachChat'
 import { useSplits } from '../hooks/useSplits'
 import { useCustomExercises } from '../hooks/useCustomExercises'
 import './styles.css'
@@ -234,7 +235,10 @@ export default function App() {
         <div className="brand">
           <h1>Lifting Tracker</h1>
         </div>
-        <SettingsMenu settings={settings} onChange={updateSettings} />
+        <div className="header-actions">
+          <CoachChat />
+          <SettingsMenu settings={settings} onChange={updateSettings} />
+        </div>
       </header>
 
       <div className="pager-viewport" ref={viewportRef}>

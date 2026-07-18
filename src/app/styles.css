@@ -2009,3 +2009,130 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- Coach chat ---------- */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.coach-btn {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.coach-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 100;
+  animation: overlay-fade 0.18s ease-out;
+}
+body.theme-light .coach-overlay {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.coach-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 460px;
+  height: min(74vh, 640px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform-origin: center;
+  animation: timer-pop 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.coach-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem 0.75rem;
+}
+.coach-head h3 {
+  font-size: 1.1rem;
+}
+
+.coach-levels {
+  margin: 0 1.25rem 0.75rem;
+}
+.coach-levels .unit-option {
+  flex: 1;
+  text-align: center;
+}
+
+.coach-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  border-top: 1px solid var(--border);
+  scrollbar-width: none;
+}
+.coach-messages::-webkit-scrollbar {
+  display: none;
+}
+
+.coach-empty {
+  margin: auto;
+  max-width: 22rem;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  padding: 1rem;
+}
+
+.coach-msg {
+  padding: 0.6rem 0.85rem;
+  border-radius: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  max-width: 85%;
+}
+.coach-msg.user {
+  align-self: flex-end;
+  background: var(--accent);
+  color: var(--on-accent);
+  border-bottom-right-radius: 4px;
+}
+.coach-msg.coach {
+  align-self: flex-start;
+  background: var(--surface-2);
+  color: var(--text);
+  border-bottom-left-radius: 4px;
+}
+.coach-msg.error {
+  color: var(--danger);
+}
+
+.coach-input {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border-top: 1px solid var(--border);
+}
+.coach-input input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  outline: none;
+}
+.coach-input input:focus {
+  border-color: var(--accent);
+}
