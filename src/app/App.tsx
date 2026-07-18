@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { useSettings } from '../hooks/useSettings'
-import { LogWorkout } from '../components/LogWorkout'
+import { LogWorkout, hasWorkoutDraft } from '../components/LogWorkout'
 import { WorkoutCard } from '../components/WorkoutCard'
 import { Nutrition } from '../components/Nutrition'
 import { Exercises } from '../components/Exercises'
@@ -16,6 +16,10 @@ type Page = 'workouts' | 'splits' | 'exercises' | 'nutrition'
 
 const PAGES: Page[] = ['workouts', 'splits', 'exercises', 'nutrition']
 const PAGER_TRANSITION = 'transform 0.34s cubic-bezier(0.22, 0.61, 0.36, 1)'
+
+// Set only while the log screen is the view on screen, so a reload reopens it
+// only if that was where the user actually was when they left.
+const LOG_OPEN_KEY = 'lifting-tracker-log-open'
 
 export default function App() {
   const { workouts, addWorkout, deleteWorkout } = useWorkouts()
@@ -32,8 +36,13 @@ export default function App() {
     deleteCustomSplit,
   } = useSplits()
   const { allExercises, addCustomExercise, removeCustomExercise } = useCustomExercises()
-  const [logging, setLogging] = useState(false)
+  // Reopen an unsaved workout after a reload only if the log screen was the
+  // view on screen when the user left (not if they had navigated away).
+  const [logging, setLogging] = useState(
+    () => hasWorkoutDraft() && localStorage.getItem(LOG_OPEN_KEY) === '1'
+  )
   const [page, setPage] = useState<Page>('workouts')
+  const [chromeHidden, setChromeHidden] = useState(false)
 
   const index = PAGES.indexOf(page)
   const indexRef = useRef(index)
@@ -50,6 +59,23 @@ export default function App() {
   useEffect(() => {
     document.body.classList.toggle('theme-light', settings.theme === 'light')
   }, [settings.theme])
+
+  // Display size: scale the whole app so the user can dial in how much fits
+  useEffect(() => {
+    document.documentElement.style.zoom = String(settings.uiScale ?? 1)
+  }, [settings.uiScale])
+
+  // Header and nav return whenever we leave the log screen
+  useEffect(() => {
+    if (!logging) setChromeHidden(false)
+  }, [logging])
+
+  // Remember whether the log screen is actually on screen (logging and on the
+  // workouts tab), so a reload knows whether to reopen it.
+  useEffect(() => {
+    if (logging && page === 'workouts') localStorage.setItem(LOG_OPEN_KEY, '1')
+    else localStorage.removeItem(LOG_OPEN_KEY)
+  }, [logging, page])
 
   // The New Workout bar grows gradually as the history approaches the top:
   // full size at scrollTop 0, compact from 160px down. The size eases toward
@@ -69,9 +95,18 @@ export default function App() {
       apply()
       raf = current === target ? 0 : requestAnimationFrame(step)
     }
+    let lastY = el.scrollTop
     const onScroll = () => {
       target = targetFor()
       if (!raf) raf = requestAnimationFrame(step)
+      // While logging, tuck the header and nav on scroll down, bring them back on scroll up
+      const y = el.scrollTop
+      if (loggingRef.current) {
+        if (y < 48) setChromeHidden(false)
+        else if (y - lastY > 6) setChromeHidden(true)
+        else if (lastY - y > 6) setChromeHidden(false)
+      }
+      lastY = y
     }
     apply()
     el.addEventListener('scroll', onScroll, { passive: true })
@@ -183,7 +218,7 @@ export default function App() {
   )
 
   return (
-    <div className="app">
+    <div className={`app${chromeHidden ? ' chrome-hidden' : ''}`}>
       <header className="app-header">
         <div className="brand">
           <h1>Lifting Tracker</h1>

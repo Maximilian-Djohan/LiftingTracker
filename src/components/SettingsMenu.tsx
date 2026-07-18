@@ -46,6 +46,33 @@ export function SettingsMenu({ settings, onChange }: Props) {
 
             <div className="settings-row">
               <div className="settings-row-text">
+                <span className="settings-row-label">Display size</span>
+                <span className="settings-row-hint">Zoom the whole app in or out</span>
+              </div>
+              <div className="unit-toggle">
+                <button
+                  className={`unit-option${settings.uiScale <= 0.9 ? ' active' : ''}`}
+                  onClick={() => onChange({ uiScale: 0.85 })}
+                >
+                  Compact
+                </button>
+                <button
+                  className={`unit-option${settings.uiScale > 0.9 && settings.uiScale < 1.1 ? ' active' : ''}`}
+                  onClick={() => onChange({ uiScale: 1 })}
+                >
+                  Normal
+                </button>
+                <button
+                  className={`unit-option${settings.uiScale >= 1.1 ? ' active' : ''}`}
+                  onClick={() => onChange({ uiScale: 1.15 })}
+                >
+                  Large
+                </button>
+              </div>
+            </div>
+
+            <div className="settings-row">
+              <div className="settings-row-text">
                 <span className="settings-row-label">Default unit</span>
                 <span className="settings-row-hint">Used when starting a new workout</span>
               </div>
