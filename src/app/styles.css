@@ -132,9 +132,8 @@ body.theme-light .settings-overlay {
 }
 
 .app-header {
-  /* Full-bleed: title hugs the left screen edge, settings the right */
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
+  /* width:100% (not 100vw) so it scales cleanly under the display-size zoom */
+  width: 100%;
   padding: 1rem 1.25rem;
   display: flex;
   align-items: center;
@@ -146,6 +145,7 @@ body.theme-light .settings-overlay {
    Only the fixed nav moves, so nothing reflows and the scroll stays stable. */
 .app.chrome-hidden .bottom-nav {
   transform: translateY(100%);
+  opacity: 0;
 }
 
 .brand {
@@ -358,11 +358,22 @@ button {
   min-width: 0;
 }
 
-.workout-header-right {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+.workout-delete {
   flex-shrink: 0;
+}
+
+/* Expand arrow lives at the bottom-right of the card */
+.workout-expand {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  background: transparent;
+  padding: 0;
+  margin-top: 0.7rem;
+}
+
+.workout-expand:hover {
+  background: transparent;
 }
 
 .workout-card-header h3 {
@@ -370,7 +381,7 @@ button {
 }
 
 .workout-date {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   color: var(--text-dim);
 }
 
@@ -752,9 +763,37 @@ textarea:focus {
 }
 
 .collapse-chevron {
-  color: var(--text-dim);
-  font-size: 0.85rem;
+  color: var(--text);
+  font-size: 1.1rem;
   flex-shrink: 0;
+  width: 1.9rem;
+  height: 1.9rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.workout-card.expanded .collapse-chevron {
+  transform: rotate(90deg);
+}
+
+/* Grid-rows trick: animate height from 0 to the content's natural height */
+.workout-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.32s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.workout-card.expanded .workout-collapse {
+  grid-template-rows: 1fr;
+}
+
+.workout-collapse-inner {
+  overflow: hidden;
+  min-height: 0;
 }
 
 .set-rows {
@@ -901,9 +940,14 @@ textarea:focus {
 
 .form-actions {
   display: flex;
-  justify-content: flex-end;
   gap: 0.8rem;
   margin-top: 1.2rem;
+}
+
+.form-actions .btn-primary {
+  flex: 1;
+  padding: 0.9rem;
+  font-size: 1.05rem;
 }
 
 /* Bottom navigation */
@@ -921,7 +965,7 @@ textarea:focus {
   background: rgba(20, 23, 28, 0.92);
   backdrop-filter: blur(10px);
   border-top: 1px solid var(--border);
-  transition: transform 0.28s ease;
+  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
 }
 
 .nav-item {
@@ -1253,7 +1297,7 @@ textarea:focus {
   border-radius: var(--radius);
   padding: 1.2rem 1.4rem;
   width: 100%;
-  max-width: 380px;
+  max-width: 520px;
   animation: pop-center 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.15);
 }
 
@@ -1314,6 +1358,24 @@ textarea:focus {
   border-radius: 9px;
   padding: 3px;
   gap: 3px;
+}
+
+/* Wide (3-option) rows stack so the control spans full width and never overflows */
+.settings-row.stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.6rem;
+}
+
+.settings-row.stacked .unit-toggle {
+  width: 100%;
+}
+
+.settings-row.stacked .unit-option {
+  flex: 1;
+  text-align: center;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
 }
 
 .unit-option {
@@ -1759,6 +1821,11 @@ textarea:focus {
 
 .copy-list-item:hover {
   border-color: var(--accent);
+}
+
+.copy-list-item.highlight {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface-2));
 }
 
 .copy-list-name {

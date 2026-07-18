@@ -44,7 +44,7 @@ export function SettingsMenu({ settings, onChange }: Props) {
               </div>
             </div>
 
-            <div className="settings-row">
+            <div className="settings-row stacked">
               <div className="settings-row-text">
                 <span className="settings-row-label">Display size</span>
                 <span className="settings-row-hint">Zoom the whole app in or out</span>
