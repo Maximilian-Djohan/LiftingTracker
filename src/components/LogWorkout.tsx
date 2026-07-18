@@ -24,6 +24,24 @@ function loadDraft(): Draft | null {
   }
 }
 
+/** True when an unsaved in-progress workout is waiting to be restored. */
+export function hasWorkoutDraft(): boolean {
+  return loadDraft() !== null
+}
+
+/** Place the caret at the end of the field so typing appends to the number. */
+function focusEnd(e: React.FocusEvent<HTMLInputElement>) {
+  const el = e.target
+  const len = el.value.length
+  requestAnimationFrame(() => {
+    try {
+      el.setSelectionRange(len, len)
+    } catch {
+      /* some input types reject setSelectionRange */
+    }
+  })
+}
+
 interface Props {
   onSave: (workout: Workout) => void
   onCancel: () => void
@@ -76,6 +94,8 @@ export function LogWorkout({
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null)
   const [openSetId, setOpenSetId] = useState<string | null>(null)
   const [creating, setCreating] = useState<string | null>(null)
+  const [confirmCancel, setConfirmCancel] = useState(false)
+  const [copyOpen, setCopyOpen] = useState(false)
 
   // Drag-to-reorder state
   const [draggingId, setDraggingId] = useState<string | null>(null)
@@ -95,6 +115,11 @@ export function LogWorkout({
   function handleCancel() {
     clearDraft()
     onCancel()
+  }
+
+  function requestCancel() {
+    if (exercises.length > 0) setConfirmCancel(true)
+    else handleCancel()
   }
 
   const lastSameDay = splitDay ? workouts.find(w => w.splitDay === splitDay) ?? null : null
@@ -126,16 +151,20 @@ export function LogWorkout({
     setStep('log')
   }
 
-  function copyFromLast() {
-    if (!lastSameDay) return
+  function copyExercisesFrom(source: Workout) {
     setExercises(
-      lastSameDay.exercises.map(ex => ({
+      source.exercises.map(ex => ({
         ...ex,
         id: crypto.randomUUID(),
         sets: ex.sets.map(s => ({ ...s, id: crypto.randomUUID(), done: false })),
       }))
     )
     setPickerOpen(false)
+    setCopyOpen(false)
+  }
+
+  function copyFromLast() {
+    if (lastSameDay) copyExercisesFrom(lastSameDay)
   }
 
   function addExerciseById(id: string) {
@@ -145,9 +174,9 @@ export function LogWorkout({
   }
 
   function confirmCreateExercise() {
-    const name = (creating ?? '').trim()
-    if (!name) return
-    const ex = onCreateExercise(name)
+    const trimmed = (creating ?? '').trim()
+    if (!trimmed) return
+    const ex = onCreateExercise(trimmed)
     setExercises(prev =>
       prev.some(e => e.exerciseId === ex.id) ? prev : [...prev, newWorkoutExercise(ex.id, ex.name, unit)]
     )
@@ -278,10 +307,42 @@ export function LogWorkout({
     window.addEventListener('pointercancel', up)
   }
 
-  // Hold the grip: the card lifts and follows the pointer while the other
-  // cards slide out of the way; the new order commits on release.
-  function startDrag(e: React.PointerEvent, id: string) {
-    e.preventDefault()
+  // Press and hold the grip for ~320ms, then the card follows the pointer while
+  // the others slide out of the way. A short tap or an early scroll does nothing.
+  const HOLD_MS = 320
+  function onGripPointerDown(e: React.PointerEvent, id: string) {
+    const startX = e.clientX
+    const startY = e.clientY
+    let curY = startY
+    let started = false
+
+    const preMove = (ev: PointerEvent) => {
+      curY = ev.clientY
+      if (!started && (Math.abs(ev.clientX - startX) > 10 || Math.abs(ev.clientY - startY) > 10)) {
+        cancel() // moved before the hold completed: treat as a scroll, not a drag
+      }
+    }
+    const cancel = () => {
+      clearTimeout(timer)
+      window.removeEventListener('pointermove', preMove)
+      window.removeEventListener('pointerup', cancel)
+      window.removeEventListener('pointercancel', cancel)
+    }
+    const timer = window.setTimeout(() => {
+      started = true
+      window.removeEventListener('pointermove', preMove)
+      window.removeEventListener('pointerup', cancel)
+      window.removeEventListener('pointercancel', cancel)
+      navigator.vibrate?.(15)
+      beginDrag(curY, id)
+    }, HOLD_MS)
+
+    window.addEventListener('pointermove', preMove)
+    window.addEventListener('pointerup', cancel)
+    window.addEventListener('pointercancel', cancel)
+  }
+
+  function beginDrag(anchorY: number, id: string) {
     const from = exercises.findIndex(x => x.id === id)
     if (from === -1) return
     const els = exercises.map(x => cardRefs.current.get(x.id))
@@ -290,13 +351,12 @@ export function LogWorkout({
     const rects = cards.map(el => el.getBoundingClientRect())
     const gap = rects.length > 1 ? Math.max(0, rects[1].top - rects[0].bottom) : 16
     const lift = rects[from].height + gap
-    const startY = e.clientY
     let target = from
 
     setDraggingId(id)
 
     const move = (ev: PointerEvent) => {
-      const dy = ev.clientY - startY
+      const dy = ev.clientY - anchorY
       const center = rects[from].top + rects[from].height / 2 + dy
 
       target = from
@@ -342,6 +402,7 @@ export function LogWorkout({
   }
 
   function handleSave() {
+    if (exercises.length === 0) return
     const workout: Workout = {
       id: crypto.randomUUID(),
       date,
@@ -427,7 +488,7 @@ export function LogWorkout({
             edit
           </button>
         </div>
-        <button className="btn-ghost" onClick={handleCancel}>Cancel</button>
+        <button className="btn-ghost" onClick={requestCancel}>Cancel</button>
       </div>
 
       {detailsOpen && (
@@ -443,10 +504,33 @@ export function LogWorkout({
         </div>
       )}
 
-      {lastSameDay && (
-        <button className="copy-last-chip" onClick={copyFromLast}>
-          ↺ Copy last {splitDay} · {lastSameDay.date}
-        </button>
+      {workouts.length > 0 && (
+        <div className="copy-row">
+          {lastSameDay && (
+            <button className="copy-last-chip" onClick={copyFromLast}>
+              ↺ Copy last {splitDay} · {lastSameDay.date}
+            </button>
+          )}
+          <button
+            className={`copy-last-chip${copyOpen ? ' active' : ''}`}
+            onClick={() => setCopyOpen(o => !o)}
+          >
+            ⧉ Copy a past workout
+          </button>
+        </div>
+      )}
+
+      {copyOpen && (
+        <div className="copy-list">
+          {workouts.slice(0, 12).map(w => (
+            <button key={w.id} className="copy-list-item" onClick={() => copyExercisesFrom(w)}>
+              <span className="copy-list-name">{w.name}</span>
+              <span className="copy-list-sub">
+                {w.date} · {w.exercises.length} exercise{w.exercises.length === 1 ? '' : 's'}
+              </span>
+            </button>
+          ))}
+        </div>
       )}
 
       <div className="exercises-list">
@@ -462,7 +546,7 @@ export function LogWorkout({
             <div className="exercise-header">
               <span
                 className="exercise-grip"
-                onPointerDown={e => startDrag(e, ex.id)}
+                onPointerDown={e => onGripPointerDown(e, ex.id)}
                 title="Hold and drag to reorder"
                 aria-label="Drag to reorder"
               >
@@ -499,9 +583,10 @@ export function LogWorkout({
                     <span className="set-num">{si + 1}</span>
                     <label className="set-field">
                       <input
-                        type="number"
-                        min="0"
+                        type="text"
+                        inputMode="decimal"
                         value={set.weight || ''}
+                        onFocus={focusEnd}
                         onChange={e => updateSet(ex.id, set.id, 'weight', parseFloat(e.target.value) || 0)}
                         placeholder="0"
                       />
@@ -509,10 +594,10 @@ export function LogWorkout({
                     </label>
                     <label className="set-field">
                       <input
-                        type="number"
-                        min="0"
-                        step="0.5"
+                        type="text"
+                        inputMode="decimal"
                         value={set.reps || ''}
+                        onFocus={focusEnd}
                         onChange={e => updateSet(ex.id, set.id, 'reps', parseFloat(e.target.value) || 0)}
                         placeholder="0"
                       />
@@ -549,7 +634,7 @@ export function LogWorkout({
               onChange={e => setPickerSearch(e.target.value)}
               placeholder="Search exercises…"
             />
-            <button className="btn-ghost small" onClick={() => setPickerOpen(false)}>Done ▴</button>
+            <button className="btn-secondary picker-done" onClick={() => setPickerOpen(false)}>Done</button>
           </div>
 
           <div className="category-filters">
@@ -631,6 +716,28 @@ export function LogWorkout({
           Save Workout
         </button>
       </div>
+
+      {confirmCancel && (
+        <div className="confirm-overlay" onClick={() => setConfirmCancel(false)}>
+          <div className="confirm-box" onClick={e => e.stopPropagation()}>
+            <h3>Save this workout?</h3>
+            <p>You have unsaved exercises. Save them before leaving?</p>
+            <div className="confirm-actions">
+              <button className="btn-primary" onClick={handleSave}>Save</button>
+              <button
+                className="btn-ghost danger"
+                onClick={() => {
+                  setConfirmCancel(false)
+                  handleCancel()
+                }}
+              >
+                Discard
+              </button>
+              <button className="btn-ghost" onClick={() => setConfirmCancel(false)}>Keep editing</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

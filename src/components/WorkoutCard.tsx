@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { Workout } from '../types'
 
 interface Props {
@@ -11,12 +12,13 @@ function formatDate(iso: string): string {
 }
 
 export function WorkoutCard({ workout, onDelete }: Props) {
+  const [expanded, setExpanded] = useState(false)
   const setCount = workout.exercises.reduce((s, ex) => s + ex.sets.length, 0)
 
   return (
-    <div className="workout-card">
-      <div className="workout-card-header">
-        <div>
+    <div className={`workout-card${expanded ? ' expanded' : ''}`}>
+      <div className="workout-card-header" onClick={() => setExpanded(e => !e)}>
+        <div className="workout-card-summary">
           <div className="workout-title-row">
             <h3>{workout.name}</h3>
             {workout.splitDay && workout.splitDay.trim().toLowerCase() !== workout.name.trim().toLowerCase() && (
@@ -24,31 +26,45 @@ export function WorkoutCard({ workout, onDelete }: Props) {
             )}
           </div>
           <span className="workout-date">{formatDate(workout.date)}</span>
-        </div>
-        <button className="btn-ghost danger small" onClick={() => onDelete(workout.id)}>Delete</button>
-      </div>
-
-      <div className="workout-stats">
-        <span><strong>{workout.exercises.length}</strong> exercises</span>
-        <span><strong>{setCount}</strong> sets</span>
-      </div>
-
-      <div className="workout-exercises">
-        {workout.exercises.map(ex => (
-          <div key={ex.id} className="workout-exercise-row">
-            <span className="ex-name">{ex.exerciseName}</span>
-            <span className="ex-sets">
-              {ex.sets.map((set, i) => (
-                <span key={set.id} className="set-pill">
-                  {set.weight}×{set.reps}{i < ex.sets.length - 1 ? '' : ''}
-                </span>
-              ))}
-            </span>
+          <div className="workout-stats">
+            <span><strong>{workout.exercises.length}</strong> exercises</span>
+            <span><strong>{setCount}</strong> sets</span>
           </div>
-        ))}
+        </div>
+        <div className="workout-header-right">
+          <button
+            className="btn-ghost danger small"
+            onClick={e => {
+              e.stopPropagation()
+              onDelete(workout.id)
+            }}
+          >
+            Delete
+          </button>
+          <span className="collapse-chevron">{expanded ? '▾' : '▸'}</span>
+        </div>
       </div>
 
-      {workout.notes && <p className="workout-notes">{workout.notes}</p>}
+      {expanded && (
+        <>
+          <div className="workout-exercises">
+            {workout.exercises.map(ex => (
+              <div key={ex.id} className="workout-exercise-row">
+                <span className="ex-name">{ex.exerciseName}</span>
+                <span className="ex-sets">
+                  {ex.sets.map(set => (
+                    <span key={set.id} className="set-pill">
+                      {set.weight}×{set.reps}
+                    </span>
+                  ))}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {workout.notes && <p className="workout-notes">{workout.notes}</p>}
+        </>
+      )}
     </div>
   )
 }

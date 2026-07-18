@@ -8,6 +8,8 @@ export interface Settings {
   showBodyMap: boolean
   minimalist: boolean
   showRestTimer: boolean
+  /** Whole-app zoom: 0.85 compact, 1 normal, 1.15 large */
+  uiScale: number
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -16,6 +18,7 @@ const DEFAULT_SETTINGS: Settings = {
   showBodyMap: true,
   minimalist: true,
   showRestTimer: false,
+  uiScale: 1,
 }
 
 export function useSettings() {
