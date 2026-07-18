@@ -470,6 +470,7 @@ export function LogWorkout({
     month: 'short',
     day: 'numeric',
   })
+  const otherWorkouts = workouts.filter(w => w.id !== lastSameDay?.id)
 
   return (
     <div className="log-workout">
@@ -515,26 +516,32 @@ export function LogWorkout({
       )}
 
       {copyOpen && (
-        <div className="copy-list">
+        <div className="copy-panel">
           {lastSameDay && (
-            <button className="copy-list-item highlight" onClick={copyFromLast}>
-              <span className="copy-list-name">↺ Copy last {splitDay} · {lastSameDay.date}</span>
-              <span className="copy-list-sub">
-                {lastSameDay.exercises.length} exercise{lastSameDay.exercises.length === 1 ? '' : 's'}
+            <button className="copy-last-featured" onClick={copyFromLast}>
+              <span className="copy-last-icon">↺</span>
+              <span className="copy-last-text">
+                <span className="copy-last-title">Copy last {splitDay}</span>
+                <span className="copy-last-meta">
+                  {lastSameDay.date} · {lastSameDay.exercises.length} exercise
+                  {lastSameDay.exercises.length === 1 ? '' : 's'}
+                </span>
               </span>
+              <span className="copy-last-arrow">→</span>
             </button>
           )}
-          {workouts
-            .filter(w => w.id !== lastSameDay?.id)
-            .slice(0, 12)
-            .map(w => (
-              <button key={w.id} className="copy-list-item" onClick={() => copyExercisesFrom(w)}>
-                <span className="copy-list-name">{w.name}</span>
-                <span className="copy-list-sub">
-                  {w.date} · {w.exercises.length} exercise{w.exercises.length === 1 ? '' : 's'}
-                </span>
-              </button>
-            ))}
+          {otherWorkouts.length > 0 && (
+            <div className="copy-list">
+              {otherWorkouts.map(w => (
+                <button key={w.id} className="copy-list-item" onClick={() => copyExercisesFrom(w)}>
+                  <span className="copy-list-name">{w.name}</span>
+                  <span className="copy-list-sub">
+                    {w.date} · {w.exercises.length} exercise{w.exercises.length === 1 ? '' : 's'}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

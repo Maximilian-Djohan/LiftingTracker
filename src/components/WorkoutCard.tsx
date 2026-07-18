@@ -34,15 +34,18 @@ export function WorkoutCard({ workout, onDelete }: Props) {
             <span><strong>{setCount}</strong> sets</span>
           </div>
         </div>
-        <button
-          className="btn-ghost danger small workout-delete"
-          onClick={e => {
-            e.stopPropagation()
-            onDelete(workout.id)
-          }}
-        >
-          Delete
-        </button>
+        <div className="workout-header-side">
+          <button
+            className="btn-ghost danger small workout-delete"
+            onClick={e => {
+              e.stopPropagation()
+              onDelete(workout.id)
+            }}
+          >
+            Delete
+          </button>
+          <span className="collapse-chevron" aria-hidden="true">▸</span>
+        </div>
       </div>
 
       {/* Grid-rows collapse: animates to the content's height without measuring */}
@@ -66,14 +69,6 @@ export function WorkoutCard({ workout, onDelete }: Props) {
           {workout.notes && <p className="workout-notes">{workout.notes}</p>}
         </div>
       </div>
-
-      <button
-        className="workout-expand"
-        onClick={() => setExpanded(e => !e)}
-        aria-label={expanded ? 'Collapse workout' : 'Expand workout'}
-      >
-        <span className="collapse-chevron">▸</span>
-      </button>
     </div>
   )
 }

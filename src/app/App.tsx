@@ -96,15 +96,26 @@ export default function App() {
       raf = current === target ? 0 : requestAnimationFrame(step)
     }
     let lastY = el.scrollTop
+    let upAccum = 0
+    const SHOW_AFTER = 60 // px of cumulative scroll-up before the nav returns
     const onScroll = () => {
       target = targetFor()
       if (!raf) raf = requestAnimationFrame(step)
-      // While logging, tuck the header and nav on scroll down, bring them back on scroll up
+      // While logging, tuck the nav on scroll down; only bring it back after
+      // scrolling up a bit (accumulated), so it is not overly sensitive.
       const y = el.scrollTop
       if (loggingRef.current) {
-        if (y < 48) setChromeHidden(false)
-        else if (y - lastY > 6) setChromeHidden(true)
-        else if (lastY - y > 6) setChromeHidden(false)
+        const dy = y - lastY
+        if (y < 48) {
+          setChromeHidden(false)
+          upAccum = 0
+        } else if (dy > 0) {
+          upAccum = 0
+          if (dy > 6) setChromeHidden(true)
+        } else if (dy < 0) {
+          upAccum += -dy
+          if (upAccum > SHOW_AFTER) setChromeHidden(false)
+        }
       }
       lastY = y
     }
@@ -164,7 +175,7 @@ export default function App() {
       if (!g.horizontal) return
 
       const dx = e.changedTouches[0].clientX - g.startX
-      const threshold = Math.min(g.width * 0.25, 90)
+      const threshold = Math.min(g.width * 0.18, 60)
       let target = indexRef.current
       if (dx <= -threshold && target < PAGES.length - 1) target += 1
       else if (dx >= threshold && target > 0) target -= 1

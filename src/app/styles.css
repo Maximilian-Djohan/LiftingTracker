@@ -346,9 +346,19 @@ button {
 .workout-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 0.8rem;
   cursor: pointer;
+}
+
+/* Delete on top, expand arrow at the bottom (inline with the stats row) */
+.workout-header-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 0.5rem;
 }
 
 .workout-card-summary {
@@ -360,20 +370,6 @@ button {
 
 .workout-delete {
   flex-shrink: 0;
-}
-
-/* Expand arrow lives at the bottom-right of the card */
-.workout-expand {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  background: transparent;
-  padding: 0;
-  margin-top: 0.7rem;
-}
-
-.workout-expand:hover {
-  background: transparent;
 }
 
 .workout-card-header h3 {
@@ -1799,11 +1795,19 @@ textarea:focus {
   color: var(--text);
 }
 
+.copy-panel {
+  margin-bottom: 1rem;
+}
+
+/* Scrollable box so a long history does not blow up the page */
 .copy-list {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  margin-bottom: 1rem;
+  max-height: 15rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .copy-list-item {
@@ -1823,9 +1827,60 @@ textarea:focus {
   border-color: var(--accent);
 }
 
-.copy-list-item.highlight {
-  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
-  background: color-mix(in srgb, var(--accent) 8%, var(--surface-2));
+/* Featured "copy last <day>" call to action */
+.copy-last-featured {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.7rem 0.85rem;
+  margin-bottom: 0.6rem;
+  border-radius: 12px;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface-2));
+  color: var(--text);
+}
+
+.copy-last-featured:hover {
+  background: color-mix(in srgb, var(--accent) 20%, var(--surface-2));
+}
+
+.copy-last-icon {
+  flex-shrink: 0;
+  width: 2.2rem;
+  height: 2.2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 1.15rem;
+}
+
+.copy-last-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.copy-last-title {
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+
+.copy-last-meta {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+.copy-last-arrow {
+  flex-shrink: 0;
+  color: var(--accent);
+  font-size: 1.15rem;
+  font-weight: 700;
 }
 
 .copy-list-name {
