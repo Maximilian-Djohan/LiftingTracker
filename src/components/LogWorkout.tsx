@@ -158,6 +158,9 @@ export function LogWorkout({
         sets: ex.sets.map(s => ({ ...s, id: crypto.randomUUID(), done: false })),
       }))
     )
+    // Log this session as the same split day the copied workout was
+    setSplitDay(source.splitDay ?? null)
+    setName(source.name)
     setPickerOpen(false)
     setCopyOpen(false)
   }
