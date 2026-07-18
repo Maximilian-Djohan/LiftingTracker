@@ -1930,9 +1930,19 @@ textarea:focus {
   gap: 0.5rem;
 }
 
-.confirm-actions .btn-primary {
+/* Consistent full-width buttons so the stack reads as three clear options */
+.confirm-actions button {
   width: 100%;
-  padding: 0.7rem;
+  padding: 0.75rem;
+  font-size: 0.98rem;
+}
+
+.confirm-actions .btn-ghost.danger {
+  border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent);
+}
+
+.confirm-actions .btn-ghost.danger:hover {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
 }
 
 .log-title-row {
@@ -1941,9 +1951,16 @@ textarea:focus {
   gap: 0.5rem;
 }
 
+.log-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
 .log-date {
+  font-size: 0.85rem;
   color: var(--text-dim);
-  font-weight: 500;
 }
 
 .log-edit {

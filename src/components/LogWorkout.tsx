@@ -478,18 +478,18 @@ export function LogWorkout({
   return (
     <div className="log-workout">
       <div className="log-head">
-        <div className="log-title-row">
-          <h2>
-            {splitDay ? `${splitDay} Day` : name.trim() || 'Workout'}
-            <span className="log-date"> · {shortDate}</span>
-          </h2>
-          <button
-            className="btn-ghost small log-edit"
-            onClick={() => setDetailsOpen(o => !o)}
-            aria-label="Edit name and date"
-          >
-            edit
-          </button>
+        <div className="log-title-block">
+          <div className="log-title-row">
+            <h2>{splitDay ? `${splitDay} Day` : name.trim() || 'Workout'}</h2>
+            <button
+              className="btn-ghost small log-edit"
+              onClick={() => setDetailsOpen(o => !o)}
+              aria-label="Edit name and date"
+            >
+              edit
+            </button>
+          </div>
+          <span className="log-date">{shortDate}</span>
         </div>
         <button className="btn-ghost" onClick={requestCancel}>Cancel</button>
       </div>
@@ -739,6 +739,7 @@ export function LogWorkout({
             <p>You have unsaved exercises. Save them before leaving?</p>
             <div className="confirm-actions">
               <button className="btn-primary" onClick={handleSave}>Save</button>
+              <button className="btn-secondary" onClick={() => setConfirmCancel(false)}>Keep editing</button>
               <button
                 className="btn-ghost danger"
                 onClick={() => {
@@ -748,7 +749,6 @@ export function LogWorkout({
               >
                 Discard
               </button>
-              <button className="btn-ghost" onClick={() => setConfirmCancel(false)}>Keep editing</button>
             </div>
           </div>
         </div>

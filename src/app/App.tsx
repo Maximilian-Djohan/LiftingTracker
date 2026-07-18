@@ -96,28 +96,28 @@ export default function App() {
       raf = current === target ? 0 : requestAnimationFrame(step)
     }
     let lastY = el.scrollTop
-    let upAccum = 0
-    const SHOW_AFTER = 60 // px of cumulative scroll-up before the nav returns
+    let lastT = performance.now()
+    // Trigger on scroll speed (px/ms): a gentle push down hides it, but it
+    // only comes back on a faster deliberate flick up.
+    const HIDE_SPEED = 0.5
+    const SHOW_SPEED = 3
     const onScroll = () => {
       target = targetFor()
       if (!raf) raf = requestAnimationFrame(step)
-      // While logging, tuck the nav on scroll down; only bring it back after
-      // scrolling up a bit (accumulated), so it is not overly sensitive.
       const y = el.scrollTop
+      const now = performance.now()
+      const dt = now - lastT
       if (loggingRef.current) {
-        const dy = y - lastY
         if (y < 48) {
           setChromeHidden(false)
-          upAccum = 0
-        } else if (dy > 0) {
-          upAccum = 0
-          if (dy > 6) setChromeHidden(true)
-        } else if (dy < 0) {
-          upAccum += -dy
-          if (upAccum > SHOW_AFTER) setChromeHidden(false)
+        } else if (dt > 0 && dt < 200) {
+          const v = (y - lastY) / dt // px per ms, positive is scrolling down
+          if (v > HIDE_SPEED) setChromeHidden(true)
+          else if (-v > SHOW_SPEED) setChromeHidden(false)
         }
       }
       lastY = y
+      lastT = now
     }
     apply()
     el.addEventListener('scroll', onScroll, { passive: true })
