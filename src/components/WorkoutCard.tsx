@@ -8,7 +8,10 @@ interface Props {
 
 function formatDate(iso: string): string {
   const d = new Date(iso + 'T00:00:00')
-  return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+  // Day-first, e.g. "Wed, 15 Jul 2026"
+  const weekday = d.toLocaleDateString(undefined, { weekday: 'short' })
+  const month = d.toLocaleDateString(undefined, { month: 'short' })
+  return `${weekday}, ${d.getDate()} ${month} ${d.getFullYear()}`
 }
 
 export function WorkoutCard({ workout, onDelete }: Props) {
@@ -31,22 +34,20 @@ export function WorkoutCard({ workout, onDelete }: Props) {
             <span><strong>{setCount}</strong> sets</span>
           </div>
         </div>
-        <div className="workout-header-right">
-          <button
-            className="btn-ghost danger small"
-            onClick={e => {
-              e.stopPropagation()
-              onDelete(workout.id)
-            }}
-          >
-            Delete
-          </button>
-          <span className="collapse-chevron">{expanded ? '▾' : '▸'}</span>
-        </div>
+        <button
+          className="btn-ghost danger small workout-delete"
+          onClick={e => {
+            e.stopPropagation()
+            onDelete(workout.id)
+          }}
+        >
+          Delete
+        </button>
       </div>
 
-      {expanded && (
-        <>
+      {/* Grid-rows collapse: animates to the content's height without measuring */}
+      <div className="workout-collapse">
+        <div className="workout-collapse-inner">
           <div className="workout-exercises">
             {workout.exercises.map(ex => (
               <div key={ex.id} className="workout-exercise-row">
@@ -63,8 +64,16 @@ export function WorkoutCard({ workout, onDelete }: Props) {
           </div>
 
           {workout.notes && <p className="workout-notes">{workout.notes}</p>}
-        </>
-      )}
+        </div>
+      </div>
+
+      <button
+        className="workout-expand"
+        onClick={() => setExpanded(e => !e)}
+        aria-label={expanded ? 'Collapse workout' : 'Expand workout'}
+      >
+        <span className="collapse-chevron">▸</span>
+      </button>
     </div>
   )
 }

@@ -29,15 +29,14 @@ export function hasWorkoutDraft(): boolean {
   return loadDraft() !== null
 }
 
-/** Place the caret at the end of the field so typing appends to the number. */
-function focusEnd(e: React.FocusEvent<HTMLInputElement>) {
+/** Select the whole value on focus so typing overwrites it. */
+function focusSelectAll(e: React.FocusEvent<HTMLInputElement>) {
   const el = e.target
-  const len = el.value.length
   requestAnimationFrame(() => {
     try {
-      el.setSelectionRange(len, len)
+      el.select()
     } catch {
-      /* some input types reject setSelectionRange */
+      /* some input types reject selection */
     }
   })
 }
@@ -506,11 +505,6 @@ export function LogWorkout({
 
       {workouts.length > 0 && (
         <div className="copy-row">
-          {lastSameDay && (
-            <button className="copy-last-chip" onClick={copyFromLast}>
-              ↺ Copy last {splitDay} · {lastSameDay.date}
-            </button>
-          )}
           <button
             className={`copy-last-chip${copyOpen ? ' active' : ''}`}
             onClick={() => setCopyOpen(o => !o)}
@@ -522,14 +516,25 @@ export function LogWorkout({
 
       {copyOpen && (
         <div className="copy-list">
-          {workouts.slice(0, 12).map(w => (
-            <button key={w.id} className="copy-list-item" onClick={() => copyExercisesFrom(w)}>
-              <span className="copy-list-name">{w.name}</span>
+          {lastSameDay && (
+            <button className="copy-list-item highlight" onClick={copyFromLast}>
+              <span className="copy-list-name">↺ Copy last {splitDay} · {lastSameDay.date}</span>
               <span className="copy-list-sub">
-                {w.date} · {w.exercises.length} exercise{w.exercises.length === 1 ? '' : 's'}
+                {lastSameDay.exercises.length} exercise{lastSameDay.exercises.length === 1 ? '' : 's'}
               </span>
             </button>
-          ))}
+          )}
+          {workouts
+            .filter(w => w.id !== lastSameDay?.id)
+            .slice(0, 12)
+            .map(w => (
+              <button key={w.id} className="copy-list-item" onClick={() => copyExercisesFrom(w)}>
+                <span className="copy-list-name">{w.name}</span>
+                <span className="copy-list-sub">
+                  {w.date} · {w.exercises.length} exercise{w.exercises.length === 1 ? '' : 's'}
+                </span>
+              </button>
+            ))}
         </div>
       )}
 
@@ -586,7 +591,7 @@ export function LogWorkout({
                         type="text"
                         inputMode="decimal"
                         value={set.weight || ''}
-                        onFocus={focusEnd}
+                        onFocus={focusSelectAll}
                         onChange={e => updateSet(ex.id, set.id, 'weight', parseFloat(e.target.value) || 0)}
                         placeholder="0"
                       />
@@ -597,7 +602,7 @@ export function LogWorkout({
                         type="text"
                         inputMode="decimal"
                         value={set.reps || ''}
-                        onFocus={focusEnd}
+                        onFocus={focusSelectAll}
                         onChange={e => updateSet(ex.id, set.id, 'reps', parseFloat(e.target.value) || 0)}
                         placeholder="0"
                       />
