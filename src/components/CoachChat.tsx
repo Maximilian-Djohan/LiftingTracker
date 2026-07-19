@@ -14,8 +14,7 @@ interface Message {
   error?: boolean
 }
 
-export function CoachChat() {
-  const [open, setOpen] = useState(false)
+export function CoachChat({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [level, setLevel] = useState<Level>(
     () => (localStorage.getItem(LEVEL_KEY) as Level) || 'intermediate'
   )
@@ -81,20 +80,12 @@ export function CoachChat() {
 
   return (
     <>
-      <button
-        className="btn-ghost coach-btn"
-        onClick={() => setOpen(true)}
-        aria-label="Ask the coach"
-      >
-        💬
-      </button>
-
       {open && (
-        <div className="coach-overlay" onClick={() => setOpen(false)}>
+        <div className="coach-overlay" onClick={onClose}>
           <div className="coach-modal" onClick={e => e.stopPropagation()}>
             <div className="coach-head">
               <h3>Coach</h3>
-              <button className="btn-ghost small" onClick={() => setOpen(false)}>
+              <button className="btn-ghost small" onClick={onClose}>
                 ✕
               </button>
             </div>

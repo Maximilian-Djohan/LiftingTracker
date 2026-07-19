@@ -335,6 +335,18 @@ button {
   gap: 1rem;
 }
 
+/* Divider line between workouts in the history list */
+.workout-divider {
+  height: 1px;
+  background: var(--border);
+  margin: -0.1rem 0.25rem;
+}
+
+.workout-header-actions {
+  display: flex;
+  gap: 0.3rem;
+}
+
 /* Workout card */
 .workout-card {
   background: var(--surface);
@@ -634,9 +646,9 @@ textarea:focus {
 }
 
 .picker-done {
-  flex-shrink: 0;
-  white-space: nowrap;
-  align-self: stretch;
+  width: 100%;
+  margin-top: 0.9rem;
+  padding: 0.7rem;
 }
 
 .exercise-picker .category-filters {

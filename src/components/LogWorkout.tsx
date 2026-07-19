@@ -50,6 +50,7 @@ interface Props {
   minimalist: boolean
   exerciseCatalog: Exercise[]
   onCreateExercise: (name: string) => Exercise
+  editing?: Workout | null
 }
 
 function newSet(unit: 'kg' | 'lbs'): WorkoutSet {
@@ -74,12 +75,23 @@ export function LogWorkout({
   minimalist,
   exerciseCatalog,
   onCreateExercise,
+  editing,
 }: Props) {
   const today = new Date().toISOString().split('T')[0]
   const unit = defaultUnit
 
-  // Restore an unsaved in-progress workout if one was left behind
-  const [initialDraft] = useState(loadDraft)
+  // Editing an existing workout takes priority over any saved draft.
+  const [initialDraft] = useState<Draft | null>(() =>
+    editing
+      ? {
+          name: editing.name,
+          date: editing.date,
+          exercises: editing.exercises,
+          notes: editing.notes ?? '',
+          splitDay: editing.splitDay ?? null,
+        }
+      : loadDraft()
+  )
   const [step, setStep] = useState<'day' | 'log'>(initialDraft ? 'log' : 'day')
   const [name, setName] = useState(initialDraft?.name ?? '')
   const [date, setDate] = useState(initialDraft?.date ?? today)
@@ -90,7 +102,6 @@ export function LogWorkout({
   const [pickerSearch, setPickerSearch] = useState('')
   const [pickerCategory, setPickerCategory] = useState<string>('all')
   const [detailsOpen, setDetailsOpen] = useState(false)
-  const [confirmRemove, setConfirmRemove] = useState<string | null>(null)
   const [openSetId, setOpenSetId] = useState<string | null>(null)
   const [creating, setCreating] = useState<string | null>(null)
   const [confirmCancel, setConfirmCancel] = useState(false)
@@ -102,17 +113,17 @@ export function LogWorkout({
 
   // Continuously persist the in-progress workout so leaving the site never loses it
   useEffect(() => {
-    if (step !== 'log') return
+    if (step !== 'log' || editing) return
     const draft: Draft = { name, date, exercises, notes, splitDay }
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
-  }, [step, name, date, exercises, notes, splitDay])
+  }, [step, name, date, exercises, notes, splitDay, editing])
 
   function clearDraft() {
     localStorage.removeItem(DRAFT_KEY)
   }
 
   function handleCancel() {
-    clearDraft()
+    if (!editing) clearDraft()
     onCancel()
   }
 
@@ -406,14 +417,14 @@ export function LogWorkout({
   function handleSave() {
     if (exercises.length === 0) return
     const workout: Workout = {
-      id: crypto.randomUUID(),
+      id: editing?.id ?? crypto.randomUUID(),
       date,
       name: name.trim() || `Workout ${date}`,
       exercises,
       notes: notes.trim() || undefined,
       splitDay: splitDay ?? undefined,
     }
-    clearDraft()
+    if (!editing) clearDraft()
     onSave(workout)
   }
 
@@ -569,19 +580,11 @@ export function LogWorkout({
               </span>
               <h3>{ex.exerciseName}</h3>
               <button
-                className={`btn-ghost small${confirmRemove === ex.id ? ' danger' : ' dim'}`}
-                onClick={() => {
-                  if (confirmRemove === ex.id) {
-                    removeExercise(ex.id)
-                    setConfirmRemove(null)
-                  } else {
-                    setConfirmRemove(ex.id)
-                  }
-                }}
-                onBlur={() => setConfirmRemove(null)}
+                className="btn-ghost small dim"
+                onClick={() => removeExercise(ex.id)}
                 aria-label="Remove exercise"
               >
-                {confirmRemove === ex.id ? 'Remove?' : '✕'}
+                ✕
               </button>
             </div>
 
@@ -649,7 +652,6 @@ export function LogWorkout({
               onChange={e => setPickerSearch(e.target.value)}
               placeholder="Search exercises…"
             />
-            <button className="btn-secondary picker-done" onClick={() => setPickerOpen(false)}>Done</button>
           </div>
 
           <div className="category-filters">
@@ -714,6 +716,10 @@ export function LogWorkout({
               })}
             </div>
           )}
+
+          <button className="btn-primary picker-done" onClick={() => setPickerOpen(false)}>
+            Done
+          </button>
         </div>
       ) : (
         <button className="btn-secondary add-exercise-toggle" onClick={() => setPickerOpen(true)}>

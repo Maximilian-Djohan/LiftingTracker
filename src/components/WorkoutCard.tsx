@@ -4,6 +4,7 @@ import type { Workout } from '../types'
 interface Props {
   workout: Workout
   onDelete: (id: string) => void
+  onEdit: (workout: Workout) => void
 }
 
 function formatDate(iso: string): string {
@@ -14,7 +15,7 @@ function formatDate(iso: string): string {
   return `${weekday}, ${d.getDate()} ${month} ${d.getFullYear()}`
 }
 
-export function WorkoutCard({ workout, onDelete }: Props) {
+export function WorkoutCard({ workout, onDelete, onEdit }: Props) {
   const [expanded, setExpanded] = useState(false)
   const setCount = workout.exercises.reduce((s, ex) => s + ex.sets.length, 0)
 
@@ -35,15 +36,26 @@ export function WorkoutCard({ workout, onDelete }: Props) {
           </div>
         </div>
         <div className="workout-header-side">
-          <button
-            className="btn-ghost danger small workout-delete"
-            onClick={e => {
-              e.stopPropagation()
-              onDelete(workout.id)
-            }}
-          >
-            Delete
-          </button>
+          <div className="workout-header-actions">
+            <button
+              className="btn-ghost small workout-edit"
+              onClick={e => {
+                e.stopPropagation()
+                onEdit(workout)
+              }}
+            >
+              Edit
+            </button>
+            <button
+              className="btn-ghost danger small workout-delete"
+              onClick={e => {
+                e.stopPropagation()
+                onDelete(workout.id)
+              }}
+            >
+              Delete
+            </button>
+          </div>
           <span className="collapse-chevron" aria-hidden="true">▸</span>
         </div>
       </div>

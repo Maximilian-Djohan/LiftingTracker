@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
+import type { Workout } from '../types'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { useSettings } from '../hooks/useSettings'
 import { LogWorkout, hasWorkoutDraft } from '../components/LogWorkout'
@@ -23,7 +24,7 @@ const PAGER_TRANSITION = 'transform 0.34s cubic-bezier(0.22, 0.61, 0.36, 1)'
 const LOG_OPEN_KEY = 'lifting-tracker-log-open'
 
 export default function App() {
-  const { workouts, addWorkout, deleteWorkout } = useWorkouts()
+  const { workouts, addWorkout, deleteWorkout, updateWorkout } = useWorkouts()
   const { settings, updateSettings } = useSettings()
   const {
     allSplits,
@@ -44,6 +45,8 @@ export default function App() {
   )
   const [page, setPage] = useState<Page>('workouts')
   const [chromeHidden, setChromeHidden] = useState(false)
+  const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null)
+  const [coachOpen, setCoachOpen] = useState(false)
 
   const index = PAGES.indexOf(page)
   const indexRef = useRef(index)
@@ -206,11 +209,17 @@ export default function App() {
       minimalist={settings.minimalist}
       exerciseCatalog={allExercises}
       onCreateExercise={addCustomExercise}
+      editing={editingWorkout}
       onSave={workout => {
-        addWorkout(workout)
+        if (editingWorkout) updateWorkout(workout)
+        else addWorkout(workout)
+        setEditingWorkout(null)
         setLogging(false)
       }}
-      onCancel={() => setLogging(false)}
+      onCancel={() => {
+        setEditingWorkout(null)
+        setLogging(false)
+      }}
     />
   ) : (
     <section className="history">
@@ -221,8 +230,18 @@ export default function App() {
         </div>
       ) : (
         <div className="workout-grid">
-          {workouts.map(w => (
-            <WorkoutCard key={w.id} workout={w} onDelete={deleteWorkout} />
+          {workouts.map((w, i) => (
+            <Fragment key={w.id}>
+              {i > 0 && <div className="workout-divider" />}
+              <WorkoutCard
+                workout={w}
+                onDelete={deleteWorkout}
+                onEdit={target => {
+                  setEditingWorkout(target)
+                  setLogging(true)
+                }}
+              />
+            </Fragment>
           ))}
         </div>
       )}
@@ -235,10 +254,7 @@ export default function App() {
         <div className="brand">
           <h1>Lifting Tracker</h1>
         </div>
-        <div className="header-actions">
-          <CoachChat />
-          <SettingsMenu settings={settings} onChange={updateSettings} />
-        </div>
+        <SettingsMenu settings={settings} onChange={updateSettings} />
       </header>
 
       <div className="pager-viewport" ref={viewportRef}>
@@ -281,7 +297,10 @@ export default function App() {
         className={`new-workout-bar${settings.showRestTimer ? '' : ' full'}${
           page !== 'workouts' || logging ? ' tucked' : ''
         }`}
-        onClick={() => setLogging(true)}
+        onClick={() => {
+          setEditingWorkout(null)
+          setLogging(true)
+        }}
       >
         + New Workout
       </button>
@@ -315,9 +334,18 @@ export default function App() {
           <span className="nav-icon">🍎</span>
           Nutrition
         </button>
+        <button
+          className={`nav-item${coachOpen ? ' active' : ''}`}
+          onClick={() => setCoachOpen(true)}
+        >
+          <span className="nav-icon">💬</span>
+          Coach
+        </button>
       </nav>
 
       {settings.showRestTimer && <RestTimerWidget />}
+
+      <CoachChat open={coachOpen} onClose={() => setCoachOpen(false)} />
     </div>
   )
 }

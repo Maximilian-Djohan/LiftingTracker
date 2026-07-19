@@ -158,6 +158,7 @@ export const DEFAULT_EXERCISES: Exercise[] = [
   { id: 'leg-press-calf-raise', name: 'Leg Press Calf Raise', category: 'calves', muscleGroups: ['calves'] },
 
   // Core
+  { id: 'ab-crunch', name: 'Ab Crunch', category: 'core', muscleGroups: ['core'] },
   { id: 'cable-crunch', name: 'Cable Crunch', category: 'core', muscleGroups: ['core'] },
   { id: 'machine-crunch', name: 'Machine Crunch', category: 'core', muscleGroups: ['core'] },
   { id: 'sit-up', name: 'Sit Up', category: 'core', muscleGroups: ['core'] },
